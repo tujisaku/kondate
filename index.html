@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ふたりの献立帖</title>
+<meta name="description" content="ふたりで献立を出し合い、買い物リストと履歴まで共有するアプリ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="献立帖">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f7f3ec">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAD30lEQVR4nO3dwXEiMRQGYbG1eRGEE/DRITkJ52BntoepmnLBto3xSHq/6O+0pynm0YgZweLT+/O5Sf/zZ/YDUF3GIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQn9nP4B7nF/ftn98vDw92jFHCotjH/cDHnO8mDhSnsI1sthkXHOkPIsrldFS4tAUAW8r1y/H31/fpRxzrryVo8fEU445WPU4Ll6Oh0w85ZjTVY9DExmHkHEIGYdQ9TguruwO2WVKOeZ01eO4lrKzuUAfp4i/t0KD/s0dY8oxJ8pbOTRMRhwpO5ihKwTJiKO19vHydPjoU445S8Y1x4WU/e/0PfXIODYpT2duIjFvK986v74dfveYcsxO1oljk7JjEdHHanHoQMHXHLuUr3XFfVVshZUjZceieArXVoij5XyWlvX53CJxqAfjEDIOIeMQWiSOlG3vrK30FeJI2cEsfm9yLeC/Q5KUr3Llfj1shZVDnawWR8rOZv1lo0W/rVxIeQojstisEEfKUxiUxWaFT2XVyWrXHDqQcQgZh5BxCA29W4nbP65p2F3PuJXDMo4ybJKD4rCMY42Z54g4LKOHAVPtHodl9NN7tt6tCBmHkHEIGYdQ9zjiPqcO0nu2I1YO++hhwFQHva3Yx7HGzHPcNYd9HGXYJP0mmJB3K0LGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGIWQcQsYhZBxCxiFkHELGITThb7z5m8Z3G/zrSK4cQsYhZBxCxiFkHELGITQhDn+t9j7j5+bKIWQcQsYhNCcOLzt+asrEXDmEjENoWhy+s9xu1qxcOYRmxuHicYuJU3LlEJoch4vH1+bOx5VDaH4cLh5k+mTmx6GySsQx/SVSUIWZlIij1ZhFHUWmUSUOFVQojiIvl+nqzKFQHK3SXGYpNYFacbRi0xms2rmXi6PVm9EYBc+6Yhyt5KS6qnm+ReNoVefVQ9kzrRtHKzy1A1U+x9JxtNqz+73iZ1c9jlZ+gnerf16n9+fz7Mdwq2V+Eqh+FpuAlWOXMtOvBZ1F0sqxC11CgrLYJK0cu7gpt8zHHLly7CKWkMQsNtlxbMomkpvFZoU4dkUqSW9it1Qcm4mJLJPFZsE4dsMqWayJ3cpxfHZ4KKsG8dmjxHHtR7k8QgrXHjcOfStyE0xjGIeQcQgZh5BxCBmHkHEIGYeQcQgZh5BxCBmH0D8LIzUwwaL5FgAAAABJRU5ErkJggg==">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAnElEQVR4nGM8kGDPQEvARFPTRy0YChbYz1hLPJdkCyg3nYAFVAH4LDiYEcyA5FL8XHIsoIodA52KIADiUiK5aICR1oUdC1ZRIpMgJsD0DZYgItt0rHqxWIA/TPEDTL00j4PBkUwHtQVYkiklqYioZEpdMBAWkJ0PsGocoCAiwxO4tOD0AUl24FFMuMqkxHQG4ssizMxBpPVDv7ADADunQYd7V5epAAAAAElFTkSuQmCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=BIZ+UDPGothic:wght@400;700&display=swap">
+<style>
+/* Layout: one-hand phone app. Fixed header, scrolling sheet, thumb-zone bottom nav. Large targets for a non-technical user. */
+:root{
+  --bg:#f7f3ec; --sheet:#fffdf9; --ink:#2f2a25; --muted:#7b7166; --line:#e7dfd3;
+  --terra:#c0603f; --terra-soft:#f6e3da; --sage:#6f8a6a; --sage-soft:#e3ebdf;
+  --mustard:#c99a2e; --done:#efebe4; --code:#efe9df;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;
+  --r:16px;
+  --navh:calc(60px + max(6px, env(safe-area-inset-bottom, 0px)));
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#1d1b18; --sheet:#262320; --ink:#efe8de; --muted:#a89d90; --line:#3a3530;
+  --terra:#e08a68; --terra-soft:#3f2b23; --sage:#9bb894; --sage-soft:#2a3328;
+  --mustard:#e0b858; --done:#2c2925; --code:#312d28; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--terra);outline-offset:2px}
+.app{max-width:28rem;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg);position:relative;padding-top:env(safe-area-inset-top,0px)}
+@supports (height:100dvh){.app{height:100dvh}}
+header{padding-block:12px 10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.25rem;letter-spacing:.02em;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:400;font-size:.75rem;color:var(--muted);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync{font-size:.75rem;padding:6px 10px;border:none;border-radius:999px;background:var(--sage-soft);color:var(--sage);white-space:nowrap;font-weight:700}
+.sync.local{background:var(--terra-soft);color:var(--terra)}
+.iconbtn{width:44px;height:44px;border:none;background:transparent;border-radius:12px;display:grid;place-items:center;color:var(--muted)}
+.iconbtn:active{background:var(--line)}
+svg.i{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-block:14px 130px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--sheet);padding-bottom:max(6px,env(safe-area-inset-bottom,0px));padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav button{border:none;background:none;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.78rem;color:var(--muted);position:relative;min-height:60px}
+nav button[aria-current="page"]{color:var(--terra);font-weight:700}
+nav .badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--terra);color:#fff;font-size:.7rem;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px;font-variant-numeric:tabular-nums}
+body:not([data-screen="app"]) nav,body:not([data-screen="app"]) #overlay,body[data-screen="loading"] header .sync,body:not([data-screen="app"]) #gear{display:none}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.15rem;margin:4px 0 4px;text-wrap:balance}
+.lead{color:var(--muted);font-size:.88rem;margin:0 0 14px}
+.empty{text-align:center;color:var(--muted);padding:36px 12px;border:2px dashed var(--line);border-radius:var(--r);font-size:.92rem}
+/* chat */
+.chat{display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:8px;align-items:flex-end;max-width:92%}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.ava{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:.85rem;background:var(--sage);color:#fff}
+.msg.me .ava{background:var(--terra)}
+.bubble{min-width:0;display:flex;flex-direction:column;gap:3px}
+.msg.me .bubble{align-items:flex-end}
+.who{font-size:.72rem;color:var(--muted)}
+.card{border:2px solid var(--line);background:var(--sheet);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;text-align:left;width:100%;transition:border-color .2s,background .2s}
+.msg.me .card{border-bottom-right-radius:6px}.msg:not(.me) .card{border-bottom-left-radius:6px}
+.card.sel{border-color:var(--terra);background:var(--terra-soft)}
+.card .dish{font-family:var(--f-display);font-weight:700;font-size:1.08rem;word-break:break-word}
+.box{width:28px;height:28px;border-radius:8px;border:2px solid var(--muted);flex:none;display:grid;place-items:center;background:var(--sheet);padding:0}
+.box svg{width:18px;height:18px;stroke:#fff;stroke-width:3;fill:none;opacity:0}
+.sel .box,.on .box{background:var(--terra);border-color:var(--terra)}
+.sel .box svg,.on .box svg{opacity:1}
+.chip{display:inline-block;font-size:.72rem;padding:1px 8px;border-radius:999px;background:var(--sage-soft);color:var(--sage);font-weight:700;white-space:nowrap}
+.chip.terra{background:var(--terra-soft);color:var(--terra)}
+.note{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:.92rem;white-space:pre-wrap}
+.composer{position:absolute;left:0;right:0;bottom:var(--navh);padding:10px max(12px,env(safe-area-inset-left,0px)) 10px max(12px,env(safe-area-inset-right,0px));background:linear-gradient(to top,var(--bg) 70%,transparent);display:flex;flex-direction:column;gap:8px}
+.quick{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:7px 14px;font-size:.88rem;min-height:38px}
+.row{display:flex;gap:8px}
+.row input{flex:1;min-width:0}
+input[type=text],input[type=password],textarea{font:inherit;font-size:16px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:14px;padding:12px 14px;min-height:50px;width:100%}
+.row input[type=text],.row input[type=password]{width:auto}
+textarea{min-height:110px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+input:focus,textarea:focus{border-color:var(--terra);outline:none}
+.btn{border:none;border-radius:14px;padding:12px 18px;min-height:50px;font-weight:700;background:var(--terra);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:var(--sheet);color:var(--ink);border:2px solid var(--line)}
+.btn.sage{background:var(--sage);color:#fff}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5}
+.btn:active{transform:scale(.98)}
+.fab{position:absolute;left:12px;right:12px;bottom:calc(var(--navh) + 10px);box-shadow:0 8px 24px rgba(80,40,20,.25);font-size:1.02rem;min-height:58px;border-radius:18px}
+.spin{width:20px;height:20px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;flex:none}
+.spin.dark{border-color:var(--line);border-top-color:var(--terra)}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* shopping */
+.progress{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
+.progress .nums{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+.progress b{font-family:var(--f-display);font-size:1.5rem}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--sage);transition:width .3s}
+.items{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--sheet);border:2px solid var(--line);border-radius:14px;padding:12px;min-height:58px;width:100%;transition:all .3s}
+.item .nm{font-size:1.08rem;font-weight:700}
+.item .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.item .txt{flex:1;min-width:0;border:none;background:none;text-align:left;padding:0}
+.item.bought{opacity:.45;background:var(--done);border-color:transparent;min-height:46px;padding-block:8px}
+.item.bought .nm{text-decoration:line-through;font-weight:400}
+.item.bought .box{background:var(--muted);border-color:var(--muted)}
+.item.bought .box svg{opacity:1}
+.item .x{border:none;background:none;color:var(--muted);width:36px;height:36px;border-radius:10px;flex:none;font-size:1.2rem}
+details.boughtArea{margin-top:16px}
+details.boughtArea summary{cursor:pointer;color:var(--muted);font-weight:700;padding:8px 0;list-style:none}
+details.boughtArea summary::-webkit-details-marker{display:none}
+.addform{display:flex;gap:8px;margin:14px 0}
+.confirm{background:var(--terra-soft);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+/* history */
+.hcard{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px}
+.hcard .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.hcard .dish{font-family:var(--f-display);font-weight:700;font-size:1.12rem}
+.meta{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.hbtn{flex:1;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:9px 12px;font-weight:700;font-size:.9rem;min-height:44px;color:var(--terra)}
+/* week */
+.weekbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);border:none;background:none;padding:6px 0;min-height:44px;text-align:left}
+.sw{width:42px;height:26px;border-radius:13px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle[aria-pressed="true"] .sw{background:var(--sage)}
+.toggle[aria-pressed="true"] .sw::after{left:19px}
+.day{display:flex;align-items:center;gap:10px;background:var(--sheet);border:2px solid var(--line);border-radius:var(--r);padding:10px 10px 10px 8px}
+.day.off{opacity:.5}
+.day .dw{font-family:var(--f-display);font-weight:700;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--sage-soft);color:var(--sage);flex:none}
+.day .dw.sat{background:#e3e8f2;color:#4f6b9a}.day .dw.sun{background:var(--terra-soft);color:var(--terra)}
+.day .name{flex:1;min-width:0;font-weight:700;font-size:1.02rem;word-break:break-word}
+.day .name small{display:block;font-weight:400;font-size:.72rem;color:var(--muted)}
+.day .ck{border:none;background:none;padding:4px;flex:none}
+.day .mini{width:40px;height:40px;border:none;background:none;border-radius:10px;color:var(--muted);display:grid;place-items:center;flex:none}
+.day .mini.locked{color:var(--mustard);background:color-mix(in srgb,var(--mustard) 15%,transparent)}
+.day .mini:disabled{opacity:.35}
+.day.shake{animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(.96);opacity:.4}60%{transform:scale(1.02)}100%{transform:none;opacity:1}}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+/* setup */
+.steps{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+.step{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;gap:12px}
+.stepno{flex:none;width:30px;height:30px;border-radius:50%;background:var(--terra);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:.95rem}
+.step .body{min-width:0;display:flex;flex-direction:column;gap:8px;flex:1}
+.step b{font-family:var(--f-display);font-size:1.02rem}
+.step p{margin:0;font-size:.9rem}
+.step a{color:var(--terra);font-weight:700}
+.step ul{margin:0;padding-left:1.2em;font-size:.88rem}
+pre.code{margin:0;background:var(--code);border-radius:12px;padding:10px 12px;font-size:.78rem;line-height:1.5;overflow-x:auto;font-family:ui-monospace,Menlo,monospace;white-space:pre}
+.msgline{font-size:.9rem;min-height:1.4em}
+.msgline.err{color:var(--terra);font-weight:700}
+.msgline.ok{color:var(--sage);font-weight:700}
+details.fold{margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
+details.fold summary{cursor:pointer;color:var(--muted);font-weight:700;padding:8px 0}
+/* modal */
+.modalwrap{position:fixed;inset:0;background:rgba(30,20,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.modal{background:var(--sheet);color:var(--ink);width:100%;max-width:28rem;border-radius:22px 22px 0 0;padding:20px max(18px,env(safe-area-inset-left,0px)) max(22px,env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px;max-height:88%;overflow-y:auto}
+.modal h3{font-family:var(--f-display);margin:0;font-size:1.15rem}
+.set{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.9rem;display:flex;flex-direction:column;gap:8px}
+.set b{display:block;margin-bottom:2px}
+.set .muted{color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + 80px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;z-index:30;max-width:90%;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-screen="loading">
+<div class="app">
+  <header>
+    <div class="brand">ふたりの献立帖<small id="roomInfo">準備中…</small></div>
+    <button class="sync local" id="syncBadge" type="button">この端末のみ</button>
+    <button class="iconbtn" id="gear" aria-label="設定" type="button"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </header>
+  <main id="main"></main>
+  <div id="overlay"></div>
+  <nav id="nav">
+    <button data-tab="chat" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>献立チャット</button>
+    <button data-tab="shop" type="button"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>買い物<span class="badge" id="shopBadge" hidden>0</span></button>
+    <button data-tab="hist" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>献立履歴</button>
+    <button data-tab="week" type="button"><svg class="i" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>7日おまかせ</button>
+  </nav>
+</div>
+<noscript>このアプリはJavaScriptが必要です。</noscript>
+
+<script type="module">
+"use strict";
+// ================= recipe dictionary (fallback) =================
+const DICT = {
+  "カレー":["豚肉","玉ねぎ","人参","じゃがいも","カレールー"],
+  "肉じゃが":["牛肉","じゃがいも","玉ねぎ","人参","しらたき","いんげん"],
+  "ハンバーグ":["合いびき肉","玉ねぎ","パン粉","卵","牛乳","ケチャップ"],
+  "生姜焼き":["豚ロース","生姜","玉ねぎ","キャベツ"],
+  "麻婆豆腐":["豆腐","豚ひき肉","長ねぎ","にんにく","生姜","豆板醤"],
+  "オムライス":["卵","鶏もも肉","玉ねぎ","ごはん","ケチャップ"],
+  "から揚げ":["鶏もも肉","生姜","にんにく","片栗粉","キャベツ"],
+  "唐揚げ":["鶏もも肉","生姜","にんにく","片栗粉","キャベツ"],
+  "パスタ":["スパゲッティ","にんにく","ベーコン","玉ねぎ","オリーブオイル"],
+  "ナポリタン":["スパゲッティ","ウインナー","玉ねぎ","ピーマン","ケチャップ"],
+  "鍋":["白菜","長ねぎ","豆腐","しいたけ","鶏もも肉","鍋つゆ"],
+  "豚汁":["豚バラ肉","大根","人参","ごぼう","こんにゃく","長ねぎ","味噌"],
+  "鮭の塩焼き":["生鮭","大根"],
+  "鮭のホイル焼き":["生鮭","玉ねぎ","しめじ","バター","レモン"],
+  "親子丼":["鶏もも肉","玉ねぎ","卵","三つ葉","ごはん"],
+  "牛丼":["牛こま肉","玉ねぎ","紅しょうが","ごはん"],
+  "餃子":["豚ひき肉","キャベツ","にら","にんにく","餃子の皮"],
+  "野菜炒め":["豚こま肉","キャベツ","もやし","人参","ピーマン"],
+  "豚キムチ":["豚バラ肉","キムチ","玉ねぎ","にら"],
+  "シチュー":["鶏もも肉","じゃがいも","玉ねぎ","人参","ブロッコリー","牛乳","シチュールー"],
+  "グラタン":["鶏もも肉","マカロニ","玉ねぎ","牛乳","バター","チーズ"],
+  "焼きそば":["中華麺","豚こま肉","キャベツ","もやし","人参"],
+  "チャーハン":["卵","長ねぎ","焼豚","ごはん"],
+  "回鍋肉":["豚バラ肉","キャベツ","ピーマン","長ねぎ","甜麺醤"],
+  "ぶり大根":["ぶり","大根","生姜"],
+  "サバの味噌煮":["サバ","生姜","長ねぎ","味噌"],
+  "肉野菜うどん":["うどん","豚こま肉","長ねぎ","油揚げ"],
+  "うどん":["うどん","長ねぎ","油揚げ"],
+  "冷しゃぶ":["豚しゃぶしゃぶ用肉","レタス","トマト","きゅうり"],
+  "すき焼き":["牛薄切り肉","白菜","長ねぎ","焼き豆腐","しらたき","卵"],
+  "とんかつ":["豚ロース","パン粉","卵","キャベツ"],
+  "天ぷら":["えび","さつまいも","なす","かぼちゃ","天ぷら粉"],
+  "ロールキャベツ":["キャベツ","合いびき肉","玉ねぎ","コンソメ"],
+  "筑前煮":["鶏もも肉","れんこん","ごぼう","人参","こんにゃく","しいたけ"]
+};
+const GENERIC = ["メインの肉か魚","玉ねぎ","季節の野菜"];
+const SEEDS = [
+  ["肉じゃが",["牛肉","じゃがいも","玉ねぎ","人参","しらたき","いんげん"]],
+  ["鮭のホイル焼き",["生鮭","玉ねぎ","しめじ","バター","レモン"]],
+  ["豚キムチ炒め",["豚バラ肉","キムチ","玉ねぎ","にら"]],
+  ["ハンバーグ",["合いびき肉","玉ねぎ","パン粉","卵","牛乳","ケチャップ"]],
+  ["麻婆豆腐",["豆腐","豚ひき肉","長ねぎ","にんにく","生姜","豆板醤"]],
+  ["カレー",["豚肉","玉ねぎ","人参","じゃがいも","カレールー"]],
+  ["親子丼",["鶏もも肉","玉ねぎ","卵","三つ葉","ごはん"]],
+  ["豚汁",["豚バラ肉","大根","人参","ごぼう","こんにゃく","長ねぎ","味噌"]],
+  ["餃子",["豚ひき肉","キャベツ","にら","にんにく","餃子の皮"]],
+  ["生姜焼き",["豚ロース","生姜","玉ねぎ","キャベツ"]]
+];
+const FIRESTORE_RULES = "rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{room}/{document=**} {\n      allow read, write: if request.auth != null && room.size() >= 16;\n    }\n  }\n}";
+const FB_BASE = "https://www.gstatic.com/firebasejs/10.14.1/";
+
+// ================= helpers =================
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s).trim().replace(/[\s　]+/g,"");
+function hid(s){let h=2166136261;for(const ch of norm(s)){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0;}return "k"+h.toString(36);}
+const uid = () => "m"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const ls = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},
+  del(k){try{localStorage.removeItem(k);}catch(e){}}
+};
+const clean = o => JSON.parse(JSON.stringify(o));
+const CHECK = '<svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"/></svg>';
+const fmtTime = t => {const d=new Date(t);return (d.getMonth()+1)+"/"+d.getDate()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");};
+const fmtDate = t => {const d=new Date(t);return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();};
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+function randRoom(){const a=new Uint8Array(12);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(36).padStart(2,"0")).join("").slice(0,24);}
+async function copyText(text,okMsg){
+  try{await navigator.clipboard.writeText(text);toast(okMsg||"コピーしました");return true;}catch(e){}
+  try{const ta=document.createElement("textarea");ta.value=text;ta.style.cssText="position:fixed;opacity:0;top:0";document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand("copy");ta.remove();if(ok){toast(okMsg||"コピーしました");return true;}}catch(e){}
+  toast("コピーできませんでした。長押しで選んでコピーしてください");return false;
+}
+const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
+
+// ================= state =================
+const S = {menus:[],shop:[],history:[],cache:{},week:null};
+let screen="loading", tab=ls.get("kondate.tab","chat");
+let myName=ls.get("kondate.name","");
+let mode=ls.get("kondate.mode",null);       // "firebase" | "local" | null
+let fbCfg=ls.get("kondate.fb",null);        // {c:{apiKey,...}, r:"room"}
+let fb=null, started=false, seedTried=false, errMsg="", lastMenuCount=0;
+const synced = () => !!fb;
+
+// ================= storage adapters =================
+const local = {
+  data: ls.get("kondate.local",{}), subs:{},
+  save(){ls.set("kondate.local",this.data);},
+  emit(col){(this.subs[col]||[]).forEach(f=>f(Object.entries(this.data[col]||{}).map(([id,v])=>({id,...v})),false));}
+};
+function friendly(e){
+  const code=(e&&(e.code||""))+"", msg=(e&&e.message||"")+"";
+  if(e&&e.friendly) return e.friendly;
+  if(/operation-not-allowed|admin-restricted/.test(code)) return "匿名ログインがオンになっていません。手順2を確認してください。";
+  if(/api-key-not-valid|invalid-api-key/.test(code+msg)) return "貼り付けた設定のapiKeyが正しくないようです。手順4をやり直してください。";
+  if(/permission-denied/.test(code)) return "データベースのルールが公開されていません。手順3のルールを貼り付けて「公開」を押してください。";
+  if(/not-found/.test(code)||/does not exist/.test(msg)) return "Firestoreのデータベースが作られていません。手順3を確認してください。";
+  if(/network|unavailable|failed-to-fetch/i.test(code+msg)) return "ネットワークにつながりませんでした。電波を確認してもう一度お試しください。";
+  return "つながりませんでした（"+(code||msg||"不明なエラー")+"）。";
+}
+function handleErr(e){
+  if(e&&/resource-exhausted|quota/.test(e.code||"")) toast("今日の無料枠の上限に達しました。明日またお試しください");
+  else toast("保存できませんでした。電波の良い所でもう一度どうぞ");
+  console.warn(e);
+}
+function listenErr(col,e){
+  console.warn("listen",col,e);
+  if(screen==="app"&&!errShown){errShown=true;toast(friendly(e));}
+}
+let errShown=false;
+const store = {
+  listen(col,cb){
+    if(fb){return fb.m.onSnapshot(fb.m.collection(fb.fs,"rooms",fb.room,col),snap=>cb(snap.docs.map(d=>({id:d.id,...d.data()})),snap.metadata.fromCache),e=>listenErr(col,e));}
+    (local.subs[col]=local.subs[col]||[]).push(cb); setTimeout(()=>local.emit(col)); return ()=>{};
+  },
+  async get(col,id){
+    if(fb){const s=await fb.m.getDoc(fb.m.doc(fb.fs,"rooms",fb.room,col,id));return s.exists()?s.data():null;}
+    return (local.data[col]||{})[id]||null;
+  },
+  async set(col,id,data){
+    data=clean(data);
+    if(fb){try{await fb.m.setDoc(fb.m.doc(fb.fs,"rooms",fb.room,col,id),data);}catch(e){handleErr(e);throw e;}return;}
+    local.data[col]=local.data[col]||{}; local.data[col][id]=data; local.save(); local.emit(col);
+  },
+  async del(col,id){
+    if(fb){try{await fb.m.deleteDoc(fb.m.doc(fb.fs,"rooms",fb.room,col,id));}catch(e){handleErr(e);throw e;}return;}
+    if(local.data[col]) delete local.data[col][id]; local.save(); local.emit(col);
+  }
+};
+const withTimeout=(p,ms,msg)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej({friendly:msg}),ms))]);
+async function connectFirebase(cfg,room){
+  let appM,authM,fsM;
+  try{[appM,authM,fsM]=await Promise.all([import(FB_BASE+"firebase-app.js"),import(FB_BASE+"firebase-auth.js"),import(FB_BASE+"firebase-firestore.js")]);}
+  catch(e){throw {friendly:"Firebaseの部品を読み込めませんでした。ネットワークを確認して、もう一度お試しください。"};}
+  let app;
+  try{app=appM.getApps().length?appM.getApp():appM.initializeApp(cfg);}catch(e){throw {friendly:"貼り付けた設定を読み取れませんでした。手順4をやり直してください。"};}
+  const auth=authM.getAuth(app);
+  try{
+    if(auth.authStateReady) await auth.authStateReady();
+    if(!auth.currentUser) await withTimeout(authM.signInAnonymously(auth),15000,"ログインに時間がかかっています。電波を確認してもう一度お試しください。");
+  }catch(e){throw e&&e.friendly?e:{friendly:friendly(e)};}
+  const fs=fsM.getFirestore(app);
+  const m={onSnapshot:fsM.onSnapshot,collection:fsM.collection,doc:fsM.doc,getDoc:fsM.getDoc,setDoc:fsM.setDoc,deleteDoc:fsM.deleteDoc};
+  try{
+    await withTimeout(m.setDoc(m.doc(fs,"rooms",room,"meta","ping"),{at:Date.now()}),15000,"データベースに書き込めませんでした。手順3（データベース作成とルール公開）を確認してください。");
+  }catch(e){throw e&&e.friendly?e:{friendly:friendly(e)};}
+  fb={m,fs,room};
+}
+
+// ================= Gemini (direct fetch, key kept in this device) =================
+const GEMINI_BASE="https://generativelanguage.googleapis.com/v1beta/models/";
+const MODEL_DEFAULT="gemini-2.5-flash", MODEL_FALLBACKS=["gemini-3-flash-preview","gemini-flash-latest"];
+const PROMPT="以下の料理を作るために必要な一般的な食材名のみをJSONの文字列配列（例: [\"豚肉\", \"玉ねぎ\", \"人参\"]）で出力してください。余計な解説は不要です。料理名: ";
+let geminiKey=ls.get("kondate.geminiKey",""), modelName=ls.get("kondate.model",MODEL_DEFAULT), aiFails=0;
+const aiReady=()=>!!geminiKey;
+async function geminiOnce(model,prompt,key){
+  const ctrl=new AbortController(); const timer=setTimeout(()=>ctrl.abort(),20000);
+  try{
+    const res=await fetch(GEMINI_BASE+model+":generateContent",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-goog-api-key":key},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json"}}),
+      signal:ctrl.signal
+    });
+    if(!res.ok){const err=new Error("HTTP "+res.status);err.status=res.status;throw err;}
+    const j=await res.json();
+    const parts=(j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];
+    return parts.map(p=>p.text||"").join("");
+  } finally { clearTimeout(timer); }
+}
+async function callGemini(prompt,key){
+  const order=[modelName,...[MODEL_DEFAULT,...MODEL_FALLBACKS].filter(m=>m!==modelName)];
+  let lastErr;
+  for(const m of order){
+    try{
+      const txt=await geminiOnce(m,prompt,key||geminiKey);
+      if(m!==modelName){modelName=m;ls.set("kondate.model",m);}
+      return txt;
+    }catch(e){lastErr=e; if(e&&e.status===404) continue; throw e;}
+  }
+  throw lastErr;
+}
+function parseArr(txt){
+  const m=String(txt||"").replace(/```(?:json)?/g,"").match(/\[[\s\S]*\]/);
+  if(!m) return null;
+  try{const a=JSON.parse(m[0]);return Array.isArray(a)&&a.every(x=>typeof x==="string")?a:null;}catch(e){return null;}
+}
+function aiErrText(e){
+  if(e&&(e.status===400||e.status===401||e.status===403)) return "APIキーが正しくないようです。Google AI Studioでキーを確認してください。";
+  if(e&&e.status===404) return "モデルが見つかりませんでした（404）。時間をおいてもう一度お試しください。";
+  if(e&&e.status===429) return "無料枠の回数制限に達しました。少し時間をおいてください。";
+  if(e&&e.status) return "Geminiがエラーを返しました（"+e.status+"）。";
+  if(e&&e.name==="AbortError") return "Geminiからの返事が20秒以内に来ませんでした。";
+  return "Geminiに接続できませんでした。電波を確認してください。";
+}
+
+// ================= decomposition =================
+function dictLookup(name){
+  const n=norm(name);
+  if(DICT[n]) return DICT[n];
+  const keys=Object.keys(DICT).sort((a,b)=>b.length-a.length);
+  for(const k of keys){ if(n.includes(k)) return DICT[k]; }
+  for(const k of keys){ if(k.includes(n)&&n.length>=2) return DICT[k]; }
+  return null;
+}
+async function decompose(name){
+  const key=norm(name);
+  if(S.cache[key]) return {ings:S.cache[key],src:"cache"};
+  const fromHist=S.history.find(h=>norm(h.name)===key&&Array.isArray(h.ings)&&h.ings.length);
+  if(fromHist) return {ings:fromHist.ings,src:"history"};
+  if(aiReady()){
+    try{
+      const arr=parseArr(await callGemini(PROMPT+name));
+      if(arr&&arr.length){
+        const ings=[...new Set(arr.map(s=>s.trim()).filter(Boolean))].slice(0,12);
+        S.cache[key]=ings;
+        store.set("cache",hid(key),{name:key,ings,at:Date.now()}).catch(()=>{});
+        return {ings,src:"ai"};
+      }
+      aiFails++;
+    }catch(e){aiFails++;console.warn("Gemini:",e);}
+  }
+  const d=dictLookup(name);
+  if(d) return {ings:d,src:"dict"};
+  return {ings:GENERIC,src:"generic"};
+}
+async function addDishesToShop(dishes){
+  const merged={}; const generic=[];
+  for(const d of dishes){
+    const r=d.ings&&d.ings.length?{ings:d.ings,src:"given"}:await decompose(d.name);
+    if(r.src==="generic") generic.push(d.name);
+    for(const ing of r.ings){
+      const id=hid(ing);
+      const cur=merged[id]||S.shop.find(x=>x.id===id)||{name:ing,tags:[],checked:false};
+      merged[id]={name:cur.name,tags:[...new Set([...(cur.tags||[]),d.name])],checked:false};
+    }
+  }
+  for(const [id,v] of Object.entries(merged)){ await store.set("shop",id,v).catch(()=>{}); }
+  return generic;
+}
+
+// ================= UI shell =================
+const whoName=id=>!id?"":(id===myName?"わたし":id);
+function setTab(t){tab=t;ls.set("kondate.tab",t);confirmDone=false;render();$("#main").scrollTop=0;if(t==="chat")scrollChatEnd();}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+const selected=new Set();
+let busy=false,confirmDone=false,showHistForm=false,boughtOpen=false;
+
+function saveInputs(){const o={};document.querySelectorAll("#main input,#main textarea,#overlay input").forEach(i=>{if(i.id)o[i.id]={v:i.value,f:document.activeElement===i,s:i.selectionStart,e:i.selectionEnd};});return o;}
+function restoreInputs(o){for(const [id,x] of Object.entries(o)){const i=document.getElementById(id);if(!i)continue;i.value=x.v;if(x.f){i.focus({preventScroll:true});try{i.setSelectionRange(x.s,x.e);}catch(e){}}}}
+
+function render(){
+  document.body.dataset.screen=screen;
+  const m=$("#main"), ov=$("#overlay");
+  if(screen!=="app"){
+    $("#roomInfo").textContent="";
+    const saved=saveInputs();
+    m.innerHTML = screen==="loading"?'<div class="empty"><span class="spin dark" style="display:inline-block;margin-bottom:8px"></span><br>つなげています…</div>'
+      : screen==="error"?errorView() : screen==="name"?nameView() : setupView();
+    ov.innerHTML="";
+    if(screen==="error")bindError(); else if(screen==="name")bindName(); else if(screen==="setup")bindSetup();
+    restoreInputs(saved); return;
+  }
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===tab?"page":"false"));
+  const left=S.shop.filter(x=>!x.checked).length;
+  const bd=$("#shopBadge"); bd.hidden=!left; bd.textContent=left;
+  const sb=$("#syncBadge"); sb.textContent=synced()?"ふたりで共有中":"この端末のみ"; sb.classList.toggle("local",!synced());
+  $("#roomInfo").textContent=(myName?myName+" ・ ":"")+(aiReady()?"AI分解モード":"辞書モード");
+  const saved=saveInputs(), st=m.scrollTop;
+  if(tab==="chat"){m.innerHTML=chatView();ov.innerHTML=chatOverlay();bindChat();}
+  else if(tab==="shop"){m.innerHTML=shopView();ov.innerHTML="";bindShop();}
+  else if(tab==="hist"){m.innerHTML=histView();ov.innerHTML="";bindHist();}
+  else {m.innerHTML=weekView();ov.innerHTML="";bindWeek();}
+  m.scrollTop=st; restoreInputs(saved);
+}
+
+// ================= setup / name / error screens =================
+function setupView(){
+  return '<h2>はじめに</h2><p class="lead">奥様と同じ画面を見るための準備です。Firebaseの無料プラン（Spark）を使うので、クレジットカードは要りません。最初の1回だけの作業です。</p>'+
+  '<div class="steps">'+
+   '<div class="step"><span class="stepno">1</span><div class="body"><b>Firebaseでプロジェクトを作る</b><p><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebaseコンソール</a>を開き、「プロジェクトを追加」を押します。名前は何でも構いません（例：kondate）。Googleアナリティクスはオフで大丈夫です。</p></div></div>'+
+   '<div class="step"><span class="stepno">2</span><div class="body"><b>匿名ログインをオンにする</b><p>左のメニューの「Authentication」を開き、「始める」→「Sign-in method」→「匿名」を有効にして保存します。</p></div></div>'+
+   '<div class="step"><span class="stepno">3</span><div class="body"><b>データベースを作り、ルールを貼る</b><p>左のメニューの「Firestore Database」→「データベースを作成」。場所は <b style="display:inline">asia-northeast1（東京）</b>、モードは「本番環境」で作ります。できたら「ルール」タブの中身をすべて消して、下の文を貼り付け、「公開」を押します。</p><pre class="code" id="rulesText">'+esc(FIRESTORE_RULES)+'</pre><button class="btn ghost" id="copyRules" type="button">ルールをコピー</button></div></div>'+
+   '<div class="step"><span class="stepno">4</span><div class="body"><b>ウェブアプリを登録して設定を貼る</b><p>プロジェクト名の横の歯車→「プロジェクトの設定」→「全般」→「マイアプリ」で、ウェブ（&lt;/&gt;）のアイコンを押します。ニックネームを付けて「アプリを登録」すると <b style="display:inline">firebaseConfig</b> が出ます。<b style="display:inline">{ から } まで</b>をコピーして、下の欄に貼ってください。</p><textarea id="cfgIn" placeholder="{\n  apiKey: &quot;AIza…&quot;,\n  authDomain: &quot;…firebaseapp.com&quot;,\n  projectId: &quot;…&quot;,\n  …\n}" spellcheck="false"></textarea></div></div>'+
+   '<div class="step"><span class="stepno">5</span><div class="body"><b>つないで始める</b><button class="btn block" id="connectBtn" type="button">つないで始める</button><div class="msgline" id="setupMsg" role="status"></div></div></div>'+
+  '</div>'+
+  '<button class="btn ghost block" id="tryLocal" type="button">まず試す（この端末だけで使う）</button>'+
+  (mode?'<button class="btn ghost block" id="backApp" type="button" style="margin-top:10px">← アプリに戻る</button>':'')+
+  '<details class="fold"><summary>招待リンクをもらった方はこちら</summary><p class="lead">いつもはリンクを開くだけで使えます。ホーム画面に追加したアプリで設定が空のときだけ、ここにリンクを貼ってください。</p><input type="text" id="inviteIn" placeholder="https://…#j=…" autocomplete="off" spellcheck="false"><button class="btn block" id="joinBtn" type="button" style="margin-top:8px">リンクで参加する</button><div class="msgline" id="joinMsg" role="status"></div></details>';
+}
+function parseConfig(text){
+  const get=k=>{const m=String(text).match(new RegExp("[\"']?"+k+"[\"']?\\s*:\\s*[\"']([^\"']+)[\"']"));return m?m[1].trim():"";};
+  const c={apiKey:get("apiKey"),authDomain:get("authDomain"),projectId:get("projectId"),storageBucket:get("storageBucket"),messagingSenderId:get("messagingSenderId"),appId:get("appId")};
+  if(!c.apiKey||!c.projectId) return null;
+  if(!c.authDomain) c.authDomain=c.projectId+".firebaseapp.com";
+  for(const k of Object.keys(c)) if(!c[k]) delete c[k];
+  return c;
+}
+function bindSetup(){
+  $("#copyRules").addEventListener("click",()=>copyText(FIRESTORE_RULES,"ルールをコピーしました"));
+  $("#tryLocal").addEventListener("click",()=>{mode="local";ls.set("kondate.mode","local");fbCfg=fbCfg;afterConnect();});
+  const back=$("#backApp"); if(back) back.addEventListener("click",()=>afterConnect());
+  $("#connectBtn").addEventListener("click",async()=>{
+    const msg=$("#setupMsg"); const cfg=parseConfig($("#cfgIn").value);
+    msg.className="msgline";
+    if(!cfg){msg.className="msgline err";msg.textContent="設定を読み取れませんでした。手順4の { から } までをそのまま貼ってください。";return;}
+    const btn=$("#connectBtn"); btn.disabled=true; btn.innerHTML='<span class="spin"></span>つないでいます…'; msg.textContent="";
+    const room=(fbCfg&&fbCfg.c&&fbCfg.c.projectId===cfg.projectId&&fbCfg.r)||randRoom();
+    try{
+      await connectFirebase(cfg,room);
+      fbCfg={c:cfg,r:room}; ls.set("kondate.fb",fbCfg); mode="firebase"; ls.set("kondate.mode","firebase");
+      resetData(); afterConnect();
+    }catch(e){
+      btn.disabled=false; btn.textContent="つないで始める";
+      msg.className="msgline err"; msg.textContent=friendly(e);
+    }
+  });
+  $("#joinBtn").addEventListener("click",()=>{
+    const msg=$("#joinMsg"); const j=readInvite($("#inviteIn").value);
+    if(!j){msg.className="msgline err";msg.textContent="リンクを読み取れませんでした。最後まで貼り付けてください。";return;}
+    fbCfg=j; ls.set("kondate.fb",j); mode="firebase"; ls.set("kondate.mode","firebase"); boot();
+  });
+}
+function readInvite(text){
+  const m=String(text).match(/j=([A-Za-z0-9_-]{20,})/); if(!m) return null;
+  try{const j=JSON.parse(b64d(m[1]));if(j&&j.c&&j.c.apiKey&&j.c.projectId&&typeof j.r==="string"&&j.r.length>=16)return {c:j.c,r:j.r};}catch(e){}
+  return null;
+}
+function inviteLink(){
+  if(!fbCfg) return "";
+  return location.origin+location.pathname+"#j="+b64e(JSON.stringify({c:fbCfg.c,r:fbCfg.r}));
+}
+function nameView(){
+  return '<h2>お名前を教えてください</h2><p class="lead">チャットの吹き出しに表示されます。ふたりが見分けられる名前にしてください。</p><form id="nameForm" class="stack" style="gap:10px"><input type="text" id="nameIn" maxlength="12" placeholder="例：ゆうさく" autocomplete="off"><button class="btn block" type="submit">この名前で始める</button></form>';
+}
+function bindName(){
+  $("#nameForm").addEventListener("submit",e=>{e.preventDefault();const v=$("#nameIn").value.trim();if(!v){toast("お名前を入れてください");return;}myName=v;ls.set("kondate.name",v);startApp();});
+  setTimeout(()=>{const i=$("#nameIn");if(i)i.focus();},50);
+}
+function errorView(){
+  return '<h2>つながりませんでした</h2><p class="lead">'+esc(errMsg)+'</p><div class="actions"><button class="btn block" id="retry" type="button">もう一度つなぐ</button><button class="btn ghost block" id="redo" type="button">設定をやり直す</button></div>';
+}
+function bindError(){
+  $("#retry").addEventListener("click",()=>boot());
+  $("#redo").addEventListener("click",()=>{screen="setup";render();});
+}
+
+// ================= chat =================
+function chatView(){
+  const msgs=[...S.menus].sort((a,b)=>a.at-b.at);
+  if(!msgs.length) return '<div class="empty">まだ献立がありません。<br>下の入力欄に「肉じゃが」のように書いて<br>送ってみましょう。</div>';
+  return '<div class="chat">'+msgs.map(m=>{
+    const mine=m.by===myName; const nm=whoName(m.by)||"";
+    const head='<div class="who">'+esc(nm)+' ・ '+fmtTime(m.at)+'</div>';
+    const ava='<div class="ava" aria-hidden="true">'+esc((mine?myName:(m.by||"?")).slice(0,1))+'</div>';
+    if(m.type==="note") return '<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+'<div class="note">'+esc(m.text)+'</div></div></div>';
+    const sel=selected.has(m.id);
+    return '<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+
+      '<button class="card '+(sel?"sel":"")+'" data-sel="'+esc(m.id)+'" aria-pressed="'+sel+'" type="button"><span class="box">'+CHECK+'</span><span><span class="dish">'+esc(m.name)+'</span>'+(m.done?' <span class="chip">完了済み</span>':'')+'</span></button></div></div>';
+  }).join("")+'</div>';
+}
+function chatOverlay(){
+  const n=selected.size;
+  const recent=[...new Set([...S.history].sort((a,b)=>b.at-a.at).map(h=>h.name))].slice(0,8);
+  if(n){
+    return '<button class="btn fab" id="toShop" type="button" '+(busy?"disabled":"")+'>'+(busy?'<span class="spin"></span>食材を考えています…':'選択した'+n+'件の献立で買い物リストを作る →')+'</button>';
+  }
+  return '<div class="composer">'+(recent.length?'<div class="quick" aria-label="最近の献立から選ぶ">'+recent.map(r=>'<button data-quick="'+esc(r)+'" type="button">'+esc(r)+'</button>').join("")+'</div>':'')+
+    '<form class="row" id="sendForm"><input type="text" id="dishIn" placeholder="食べたい献立を書く（例：肉じゃが）" autocomplete="off" enterkeyhint="send"><button class="btn" type="submit" aria-label="送信"><svg class="i" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></form></div>';
+}
+async function postDish(name){
+  name=String(name).trim(); if(!name) return;
+  await store.set("menus",uid(),{type:"dish",name,by:myName,at:Date.now(),done:false}).catch(()=>{});
+  scrollChatEnd();
+}
+function scrollChatEnd(){requestAnimationFrame(()=>{const m=$("#main");m.scrollTop=m.scrollHeight;});}
+function bindChat(){
+  document.querySelectorAll("[data-sel]").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.sel;selected.has(id)?selected.delete(id):selected.add(id);render();}));
+  document.querySelectorAll("[data-quick]").forEach(b=>b.addEventListener("click",()=>postDish(b.dataset.quick)));
+  const f=$("#sendForm"); if(f) f.addEventListener("submit",e=>{e.preventDefault();const i=$("#dishIn");const v=i.value;i.value="";postDish(v);});
+  const t=$("#toShop"); if(t) t.addEventListener("click",async()=>{
+    busy=true;render();
+    const dishes=S.menus.filter(m=>selected.has(m.id)).map(m=>({name:m.name}));
+    aiFails=0;
+    const generic=await addDishesToShop(dishes);
+    busy=false;selected.clear();setTab("shop");
+    if(aiFails) toast("AIにつながらなかったので、辞書で食材を出しました");
+    else if(generic.length) toast("「"+generic.join("・")+"」はおおまかな食材です。下で直せます");
+  });
+}
+
+// ================= shopping =================
+function shopView(){
+  const all=S.shop; const todo=all.filter(x=>!x.checked).sort((a,b)=>a.name.localeCompare(b.name,"ja")); const done=all.filter(x=>x.checked);
+  if(!all.length) return '<h2>買い物リスト</h2><p class="lead">チャットで献立にチェックを入れると、食材がここに並びます。</p><div class="empty">リストは空です</div>'+addForm();
+  const pct=Math.round(done.length/all.length*100);
+  const row=(x,b)=>'<div class="item '+(b?"bought":"")+'"><button class="box" data-ck="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を'+(b?"未購入に戻す":"買った")+'" type="button">'+CHECK+'</button><button class="txt" data-ck="'+esc(x.id)+'" type="button"><div class="nm">'+esc(x.name)+'</div>'+(b?'':'<div class="tags">'+(x.tags||[]).map(t=>'<span class="chip terra">'+esc(t)+'</span>').join("")+'</div>')+'</button><button class="x" data-rm="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を削除" type="button">×</button></div>';
+  let h='<div class="progress"><div class="nums"><span>買い物の進み具合</span><span><b>'+done.length+'</b> / '+all.length+' 完了</span></div><div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+  h+='<div class="items">'+(todo.length?todo.map(x=>row(x,false)).join(""):'<div class="empty" style="padding:20px">全部そろいました！</div>')+'</div>';
+  h+=addForm();
+  if(done.length) h+='<details class="boughtArea" id="boughtArea" '+(boughtOpen?"open":"")+'><summary>✓ 買ったもの（'+done.length+'）をみる</summary><div class="items">'+done.map(x=>row(x,true)).join("")+'</div></details>';
+  h+='<div class="actions">'+(confirmDone?
+    '<div class="confirm"><b>買い物を完了しますか？</b><span style="font-size:.88rem">リストを空にして、献立を履歴に残します。</span><div class="row"><button class="btn ghost" id="noDone" style="flex:1" type="button">やめる</button><button class="btn sage" id="yesDone" style="flex:1" type="button">完了する</button></div></div>'
+    :'<button class="btn sage block" id="doneBtn" type="button">買い物を完了する</button>')+'</div>';
+  return h;
+}
+function addForm(){return '<form class="addform" id="addForm"><input type="text" id="addIn" placeholder="＋ 食材を手で追加（例：牛乳）" autocomplete="off"><button class="btn ghost" type="submit">追加</button></form>';}
+function bindShop(){
+  document.querySelectorAll("[data-ck]").forEach(b=>b.addEventListener("click",()=>{const x=S.shop.find(i=>i.id===b.dataset.ck);if(!x)return;x.checked=!x.checked;render();store.set("shop",x.id,{name:x.name,tags:x.tags||[],checked:x.checked}).catch(()=>{});}));
+  document.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{S.shop=S.shop.filter(i=>i.id!==b.dataset.rm);render();store.del("shop",b.dataset.rm).catch(()=>{});}));
+  const ba=$("#boughtArea"); if(ba) ba.addEventListener("toggle",()=>{boughtOpen=ba.open;});
+  $("#addForm").addEventListener("submit",e=>{e.preventDefault();const v=$("#addIn").value.trim();if(!v)return;$("#addIn").value="";const id=hid(v);const cur=S.shop.find(i=>i.id===id);store.set("shop",id,{name:v,tags:cur?cur.tags:["手で追加"],checked:false}).catch(()=>{});});
+  const d=$("#doneBtn"); if(d) d.addEventListener("click",()=>{confirmDone=true;render();});
+  const n=$("#noDone"); if(n) n.addEventListener("click",()=>{confirmDone=false;render();});
+  const y=$("#yesDone"); if(y) y.addEventListener("click",completeShopping);
+}
+async function completeShopping(){
+  const items=[...S.shop]; const dishes={};
+  for(const it of items) for(const t of (it.tags||[])) if(t!=="手で追加"){(dishes[t]=dishes[t]||[]).push(it.name);}
+  const now=Date.now();
+  for(const [name,ings] of Object.entries(dishes)){
+    const m=[...S.menus].filter(x=>x.type==="dish"&&norm(x.name)===norm(name)).sort((a,b)=>b.at-a.at)[0];
+    await store.set("history",uid(),{name,by:m?m.by:myName,at:now,ings}).catch(()=>{});
+    for(const mm of S.menus.filter(x=>x.type==="dish"&&!x.done&&norm(x.name)===norm(name))){
+      await store.set("menus",mm.id,{type:"dish",name:mm.name,by:mm.by||"",at:mm.at,done:true}).catch(()=>{});
+    }
+  }
+  for(const it of items) await store.del("shop",it.id).catch(()=>{});
+  confirmDone=false; toast("おつかれさまでした！履歴に残しました"); setTab("hist");
+}
+
+// ================= history =================
+function histView(){
+  const hs=[...S.history].sort((a,b)=>b.at-a.at);
+  let h='<h2>献立履歴</h2><p class="lead">買い物を完了した献立がたまっていきます。「7日おまかせ」はここから選びます。</p>';
+  h+= showHistForm
+    ? '<form class="hcard" id="histForm" style="margin-bottom:12px"><b>履歴に手で登録</b><input type="text" id="hName" placeholder="献立名（例：筑前煮）" autocomplete="off"><input type="text" id="hIngs" placeholder="食材を「、」で区切る（空なら自動）" autocomplete="off"><div class="row"><button type="button" class="btn ghost" id="hCancel" style="flex:1">やめる</button><button class="btn" type="submit" style="flex:1">登録</button></div></form>'
+    : '<button class="btn ghost block" id="hOpen" type="button" style="margin-bottom:12px">＋ 履歴に手で献立を登録</button>';
+  if(!hs.length) return h+'<div class="empty">まだ履歴はありません</div>';
+  h+='<div class="stack">'+hs.map(x=>'<div class="hcard"><div class="top"><span class="dish">'+esc(x.name)+(x.sample?' <span class="chip">例</span>':'')+'</span><span class="meta">'+fmtDate(x.at)+(x.by?' ・ '+esc(whoName(x.by)):'')+'</span></div><div class="tags">'+(x.ings||[]).map(i=>'<span class="chip">'+esc(i)+'</span>').join("")+'</div><div class="row"><button class="hbtn" data-again="'+esc(x.id)+'" type="button">＋ 買い物リストに追加</button><button class="hbtn" data-post="'+esc(x.id)+'" type="button" style="color:var(--sage)">チャットに出す</button></div></div>').join("")+'</div>';
+  return h;
+}
+function bindHist(){
+  const o=$("#hOpen"); if(o) o.addEventListener("click",()=>{showHistForm=true;render();const i=$("#hName");if(i)i.focus();});
+  const c=$("#hCancel"); if(c) c.addEventListener("click",()=>{showHistForm=false;render();});
+  const f=$("#histForm"); if(f) f.addEventListener("submit",async e=>{e.preventDefault();const name=$("#hName").value.trim();if(!name)return;let ings=$("#hIngs").value.split(/[、,，\s]+/).map(s=>s.trim()).filter(Boolean);if(!ings.length)ings=(await decompose(name)).ings;await store.set("history",uid(),{name,by:myName,at:Date.now(),ings}).catch(()=>{});showHistForm=false;render();toast("「"+name+"」を履歴に登録しました");});
+  document.querySelectorAll("[data-again]").forEach(b=>b.addEventListener("click",async()=>{const x=S.history.find(h=>h.id===b.dataset.again);if(!x)return;await addDishesToShop([{name:x.name,ings:x.ings}]);toast("「"+x.name+"」の食材をリストに入れました");render();}));
+  document.querySelectorAll("[data-post]").forEach(b=>b.addEventListener("click",async()=>{const x=S.history.find(h=>h.id===b.dataset.post);if(!x)return;await postDish(x.name);toast("チャットに出しました");}));
+}
+
+// ================= week =================
+const DOW=["月","火","水","木","金","土","日"];
+let fillDict=ls.get("kondate.fill",true), animDays=new Set();
+function pool(){
+  const names=[...new Set(S.history.map(h=>h.name))];
+  if(fillDict&&names.length<7){for(const k of Object.keys(DICT)) if(k!=="唐揚げ"&&k!=="うどん"&&!names.some(n=>norm(n)===k)) names.push(k);}
+  return names;
+}
+function pick(exclude){const p=pool().filter(n=>!exclude.includes(n));if(!p.length)return null;return p[Math.floor(Math.random()*p.length)];}
+function weekDays(){return (S.week&&Array.isArray(S.week.days)&&S.week.days.length===7)?S.week.days.map(d=>({...d})):null;}
+async function saveWeek(days){S.week={days};render();await store.set("week","current",{days,at:Date.now()}).catch(()=>{});}
+function shuffleAll(){
+  const cur=weekDays()||DOW.map(()=>({name:null,locked:false,on:true}));
+  const used=cur.filter(d=>d.locked&&d.name).map(d=>d.name);
+  const days=cur.map(d=>{if(d.locked&&d.name)return d;const n=pick(used);if(n)used.push(n);return {name:n,locked:false,on:d.on!==false};});
+  animDays=new Set(days.map((d,i)=>d.locked?-1:i));saveWeek(days);
+}
+function weekView(){
+  const days=weekDays(); const n=new Set(S.history.map(h=>h.name)).size;
+  let h='<h2>7日おまかせ献立</h2><p class="lead">履歴から1週間分をくじ引きします。気に入った日は鍵でとめておけます。</p>';
+  h+='<div class="weekbar"><button class="toggle" id="fillT" type="button" aria-pressed="'+fillDict+'"><span class="sw"></span>足りない分はおすすめ料理で補う</button></div>';
+  if(n<7&&!fillDict) h+='<p class="lead" style="color:var(--terra)">履歴が'+n+'件なので、空く日が出ます。</p>';
+  if(!days) return h+'<div class="empty">まだ今週の献立がありません<br><br><button class="btn" id="firstShuffle" type="button">7日分をつくる</button></div>';
+  const fromHist=new Set(S.history.map(x=>x.name));
+  h+='<div class="stack" style="gap:8px">'+days.map((d,i)=>{
+    const on=d.on!==false;
+    return '<div class="day '+(on?"on":"off")+' '+(animDays.has(i)?"shake":"")+'"><button class="ck" data-on="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を買い物に'+(on?"含めない":"含める")+'"><span class="box">'+CHECK+'</span></button><span class="dw '+(i===5?"sat":i===6?"sun":"")+'">'+DOW[i]+'</span><span class="name">'+(d.name?esc(d.name):'<span style="color:var(--muted)">（空き）</span>')+(d.name&&!fromHist.has(d.name)?'<small>おすすめ料理から</small>':'')+'</span><button class="mini '+(d.locked?"locked":"")+'" data-lock="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を'+(d.locked?"固定解除":"固定")+'" aria-pressed="'+!!d.locked+'"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="'+(d.locked?"M7 11V7a5 5 0 0 1 10 0v4":"M7 11V7a5 5 0 0 1 9.9-1")+'"/></svg></button><button class="mini" data-re="'+i+'" type="button" aria-label="'+DOW[i]+'曜日だけ引き直す" '+(d.locked?"disabled":"")+'><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"/></svg></button></div>';
+  }).join("")+'</div>';
+  const cnt=days.filter(d=>d.on!==false&&d.name).length;
+  h+='<div class="actions"><button class="btn ghost block" id="shuf" type="button"><svg class="i" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>全体をシャッフル</button>'+
+     '<button class="btn block" id="wkShop" type="button" '+(cnt&&!busy?"":"disabled")+'>'+(busy?'<span class="spin"></span>食材を考えています…':'選んだ'+cnt+'日分の食材を買い物リストへ →')+'</button>'+
+     '<button class="btn sage block" id="wkChat" type="button" '+(cnt?"":"disabled")+'>今週の献立としてチャットに共有</button></div>';
+  return h;
+}
+function bindWeek(){
+  setTimeout(()=>{animDays=new Set();},500);
+  $("#fillT").addEventListener("click",()=>{fillDict=!fillDict;ls.set("kondate.fill",fillDict);render();});
+  const fs=$("#firstShuffle"); if(fs) fs.addEventListener("click",shuffleAll);
+  const sh=$("#shuf"); if(sh) sh.addEventListener("click",shuffleAll);
+  document.querySelectorAll("[data-on]").forEach(b=>b.addEventListener("click",()=>{const d=weekDays();const i=+b.dataset.on;d[i].on=d[i].on===false;saveWeek(d);}));
+  document.querySelectorAll("[data-lock]").forEach(b=>b.addEventListener("click",()=>{const d=weekDays();const i=+b.dataset.lock;d[i].locked=!d[i].locked;saveWeek(d);}));
+  document.querySelectorAll("[data-re]").forEach(b=>b.addEventListener("click",()=>{const d=weekDays();const i=+b.dataset.re;const n=pick(d.map(x=>x.name).filter(Boolean));if(n){d[i].name=n;animDays=new Set([i]);saveWeek(d);}else toast("ほかに候補がありません");}));
+  const ws=$("#wkShop"); if(ws) ws.addEventListener("click",async()=>{
+    const d=weekDays().filter(x=>x.on!==false&&x.name);
+    busy=true;render();aiFails=0;
+    const dishes=d.map(x=>{const h=[...S.history].filter(y=>y.name===x.name).sort((a,b)=>b.at-a.at)[0];return {name:x.name,ings:h?h.ings:null};});
+    await addDishesToShop(dishes);busy=false;setTab("shop");toast(d.length+"日分の食材をまとめました");
+  });
+  const wc=$("#wkChat"); if(wc) wc.addEventListener("click",async()=>{
+    const d=weekDays();const text="📅 今週の献立\n"+d.map((x,i)=>x.on!==false&&x.name?DOW[i]+"　"+x.name:null).filter(Boolean).join("\n");
+    await store.set("menus",uid(),{type:"note",text,by:myName,at:Date.now()}).catch(()=>{});
+    setTab("chat");
+  });
+}
+
+// ================= settings modal =================
+function openSettings(){
+  const ov=document.createElement("div");ov.className="modalwrap";
+  let confirmLeave=false;
+  const draw=()=>{
+    const link=inviteLink();
+    ov.innerHTML='<div class="modal" role="dialog" aria-label="設定"><h3>設定</h3>'+
+    '<div class="set"><b>お名前</b><div class="row"><input type="text" id="nameChg" maxlength="12" value="'+esc(myName)+'" autocomplete="off"><button class="btn ghost" id="nameSave" type="button">変更</button></div></div>'+
+    (mode==="firebase"
+      ?'<div class="set"><b>奥様に送る招待リンク</b><span class="muted">このリンクを開くだけで、同じ献立帖につながります。ふたり以外には送らないでください。</span><input type="text" id="invLink" readonly value="'+esc(link)+'"><div class="row"><button class="btn" id="invCopy" type="button" style="flex:1">コピー</button>'+(navigator.share?'<button class="btn sage" id="invShare" type="button" style="flex:1">LINEなどで送る</button>':'')+'</div><span class="muted">奥様のiPhoneでは、リンクをSafariで開いたあと、共有ボタンから「ホーム画面に追加」をするとアプリのように使えます。</span></div>'
+      :'<div class="set"><b>共有のようす</b><span class="muted">いまはこの端末の中だけに保存しています。奥様と共有するには準備が必要です。</span><button class="btn block" id="goSetup" type="button">共有の設定をはじめる</button></div>')+
+    '<div class="set"><b>Gemini APIキー</b><span class="muted">Google AI Studioで無料で取れるキーです。入れると、辞書にない料理もAIが食材に分けます。キーはこの端末の中だけに保存されます。</span>'+
+      '<div><span class="chip '+(geminiKey?'':'terra')+'">'+(geminiKey?'AI分解モード（キー保存済み）':'辞書モード（キー未設定）')+'</span></div>'+
+      '<input type="password" id="keyIn" placeholder="AIza… で始まるキーを貼り付け" autocomplete="off" value="'+esc(geminiKey)+'">'+
+      '<div class="row"><button class="btn" id="keySave" type="button" style="flex:1">保存</button><button class="btn ghost" id="keyTest" type="button" style="flex:1">接続テスト</button></div>'+
+      (geminiKey?'<button class="btn ghost block" id="keyDel" type="button">キーを消して辞書モードに戻す</button>':'')+
+      '<div id="keyMsg" class="msgline" role="status"></div><span class="muted" style="font-size:.78rem">使用モデル：'+esc(modelName)+'</span></div>'+
+    (mode==="firebase"
+      ?'<div class="set"><b>この端末の接続</b>'+(confirmLeave?'<span class="muted">この端末の設定を消します。献立のデータは消えません。もう一度つなぐには招待リンクが必要です。</span><div class="row"><button class="btn ghost" id="leaveNo" type="button" style="flex:1">やめる</button><button class="btn" id="leaveYes" type="button" style="flex:1">解除する</button></div>':'<button class="btn ghost block" id="leave" type="button">接続を解除する</button>')+'</div>':'')+
+    '<div class="set"><b>辞書に入っている料理（'+Object.keys(DICT).length+'品）</b><span class="muted">'+esc(Object.keys(DICT).join("・"))+'</span></div>'+
+    '<button class="btn block" id="closeM" type="button">とじる</button></div>';
+    const q=s=>ov.querySelector(s), msg=t=>{const m=q("#keyMsg");if(m)m.textContent=t;};
+    q("#closeM").onclick=()=>ov.remove();
+    q("#nameSave").onclick=()=>{const v=q("#nameChg").value.trim();if(!v){toast("お名前を入れてください");return;}myName=v;ls.set("kondate.name",v);render();toast("名前を変えました");};
+    if(q("#invCopy")){q("#invCopy").onclick=()=>copyText(link,"リンクをコピーしました");q("#invLink").onfocus=e=>e.target.select();}
+    if(q("#invShare")) q("#invShare").onclick=()=>{navigator.share({title:"ふたりの献立帖",text:"献立アプリです。開いたら名前を入れてね。",url:link}).catch(()=>{});};
+    if(q("#goSetup")) q("#goSetup").onclick=()=>{ov.remove();screen="setup";render();};
+    q("#keySave").onclick=()=>{const v=q("#keyIn").value.trim();geminiKey=v;ls.set("kondate.geminiKey",v);draw();render();const m=q("#keyMsg");if(m){m.className="msgline ok";m.textContent=v?"保存しました。「接続テスト」で動くか確かめられます。":"キーが空なので辞書モードです。";}};
+    q("#keyTest").onclick=async()=>{
+      const v=q("#keyIn").value.trim();
+      if(!v){msg("先にキーを入れてください。");return;}
+      q("#keyMsg").className="msgline"; msg("Geminiに問い合わせています…");
+      try{const arr=parseArr(await callGemini(PROMPT+"カレー",v));const m=q("#keyMsg");if(arr&&arr.length){m.className="msgline ok";m.textContent="つながりました（"+modelName+"）。カレー → "+arr.join("、");}else{m.className="msgline err";m.textContent="つながりましたが、答えの形が想定と違いました。";}}
+      catch(e){const m=q("#keyMsg");m.className="msgline err";m.textContent=aiErrText(e);}
+    };
+    if(q("#keyDel")) q("#keyDel").onclick=()=>{geminiKey="";ls.set("kondate.geminiKey","");draw();render();};
+    if(q("#leave")) q("#leave").onclick=()=>{confirmLeave=true;draw();};
+    if(q("#leaveNo")) q("#leaveNo").onclick=()=>{confirmLeave=false;draw();};
+    if(q("#leaveYes")) q("#leaveYes").onclick=()=>{ls.del("kondate.fb");ls.del("kondate.mode");try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}location.reload();};
+  };
+  draw(); ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();}); document.body.appendChild(ov);
+}
+$("#gear").addEventListener("click",openSettings);
+$("#syncBadge").addEventListener("click",()=>{if(screen==="app")openSettings();});
+
+// ================= boot =================
+function resetData(){S.menus=[];S.shop=[];S.history=[];S.cache={};S.week=null;seedTried=false;}
+async function seedIfNeeded(){
+  try{
+    if(await store.get("meta","seeded")) return;
+    if(S.history.length){await store.set("meta","seeded",{at:Date.now()});return;}
+    const now=Date.now();
+    for(let i=0;i<SEEDS.length;i++){
+      await store.set("history","s"+String(i+1).padStart(2,"0"),{name:SEEDS[i][0],ings:SEEDS[i][1],at:now-(i+1)*2*86400000,sample:true});
+    }
+    await store.set("meta","seeded",{at:now});
+  }catch(e){console.warn("seed",e);}
+}
+function subscribeAll(){
+  store.listen("menus",rows=>{S.menus=rows;const grew=rows.length>lastMenuCount;lastMenuCount=rows.length;render();if(tab==="chat"&&grew&&screen==="app")scrollChatEnd();});
+  store.listen("shop",rows=>{S.shop=rows;render();});
+  store.listen("history",(rows,fromCache)=>{S.history=rows;render();if(!fromCache&&!seedTried){seedTried=true;seedIfNeeded();}});
+  store.listen("cache",rows=>{for(const r of rows) if(r.name&&Array.isArray(r.ings)) S.cache[r.name]=r.ings;});
+  store.listen("week",rows=>{const w=rows.find(r=>r.id==="current");S.week=w||null;render();});
+}
+function startApp(){
+  screen="app";
+  if(!started){started=true;subscribeAll();}
+  render(); if(tab==="chat") scrollChatEnd();
+}
+function afterConnect(){
+  if(!myName){screen="name";render();return;}
+  startApp();
+}
+function applyHash(){
+  const j=readInvite(location.hash||"");
+  if(!j) return;
+  if(!(fbCfg&&fbCfg.r===j.r&&fbCfg.c&&fbCfg.c.projectId===j.c.projectId)){
+    fbCfg=j; ls.set("kondate.fb",j);
+  }
+  mode="firebase"; ls.set("kondate.mode","firebase");
+}
+async function boot(){
+  applyHash();
+  if(mode==="firebase"&&fbCfg){
+    screen="loading"; render();
+    try{ if(!fb) await connectFirebase(fbCfg.c,fbCfg.r); }
+    catch(e){screen="error";errMsg=friendly(e);render();return;}
+  }else if(mode==="local"){
+    // local mode: nothing to connect
+  }else{
+    screen="setup"; render(); return;
+  }
+  afterConnect();
+}
+boot();
+</script>
+</body>
+</html>
