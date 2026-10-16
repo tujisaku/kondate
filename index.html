@@ -101,16 +101,6 @@ input:focus,textarea:focus{border-color:var(--terra);outline:none}
 .progress b{font-family:var(--f-display);font-size:1.5rem}
 .bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:var(--sage);transition:width .3s}
-.items{display:flex;flex-direction:column;gap:8px}
-.item{display:flex;align-items:center;gap:12px;background:var(--sheet);border:2px solid var(--line);border-radius:14px;padding:12px;min-height:58px;width:100%;transition:all .3s}
-.item .nm{font-size:1.08rem;font-weight:700}
-.item .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
-.item .txt{flex:1;min-width:0;border:none;background:none;text-align:left;padding:0}
-.item.bought{opacity:.45;background:var(--done);border-color:transparent;min-height:46px;padding-block:8px}
-.item.bought .nm{text-decoration:line-through;font-weight:400}
-.item.bought .box{background:var(--muted);border-color:var(--muted)}
-.item.bought .box svg{opacity:1}
-.item .x{border:none;background:none;color:var(--muted);width:36px;height:36px;border-radius:10px;flex:none;font-size:1.2rem}
 details.boughtArea{margin-top:16px}
 details.boughtArea summary{cursor:pointer;color:var(--muted);font-weight:700;padding:8px 0;list-style:none}
 details.boughtArea summary::-webkit-details-marker{display:none}
@@ -166,7 +156,38 @@ details.fold summary{cursor:pointer;color:var(--muted);font-weight:700;padding:8
 .set{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.9rem;display:flex;flex-direction:column;gap:8px}
 .set b{display:block;margin-bottom:2px}
 .set .muted{color:var(--muted)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + 80px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;z-index:30;max-width:90%;text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + 80px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;z-index:30;max-width:90%;text-align:center;display:flex;align-items:center;gap:12px}
+.toast button{border:none;background:none;color:var(--terra-soft);font-weight:700;text-decoration:underline;padding:4px 2px;white-space:nowrap;font-size:.9rem}
+/* swipe to delete */
+.swipe{position:relative;overflow:hidden;border-radius:var(--r)}
+.swipe-del{position:absolute;top:0;bottom:0;right:0;width:84px;border:none;background:#c84b3a;color:#fff;border-radius:var(--r);font-weight:700;font-size:.82rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.swipe-del svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.swipe-fg{position:relative;background:var(--bg);display:flex;flex-direction:column;touch-action:pan-y;-webkit-user-select:none;user-select:none;transition:transform .22s ease}
+.swipe.open .swipe-fg{transform:translateX(-92px)}
+.hint{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin:0 0 12px}
+.linkbtn{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:700;color:var(--terra);min-height:36px;white-space:nowrap}
+/* composer textarea */
+.composer .row{align-items:flex-end}
+.composer textarea{flex:1;min-width:0;width:auto;min-height:50px;max-height:132px;height:50px;resize:none;font-family:var(--f-body);font-size:16px;line-height:1.4;padding:12px 14px;overflow-y:auto}
+textarea.plain{font-family:var(--f-body);font-size:16px;min-height:0;line-height:1.5}
+/* shopping tiles */
+.aisle{margin-bottom:12px}
+.ah{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--muted);margin:0 2px 6px}
+.ah::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--sage)}
+.ah span{font-weight:400}
+.tiles{display:flex;flex-wrap:wrap;gap:6px}
+.tile{display:inline-flex;align-items:stretch;background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;max-width:100%;min-width:0}
+.tile .tb{border:none;background:none;display:flex;align-items:center;gap:7px;padding:5px 2px 5px 9px;text-align:left;min-height:42px;min-width:0}
+.tile .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
+.tile .dot svg{width:12px;height:12px;stroke:#fff;stroke-width:3.5;fill:none;opacity:0}
+.tile .tw{display:flex;flex-direction:column;min-width:0}
+.tile .tn{font-weight:700;font-size:.95rem;line-height:1.25;word-break:break-word}
+.tile .tt{font-size:.66rem;line-height:1.3;color:var(--terra);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:10em}
+.tile .tx{border:none;background:none;color:var(--muted);width:30px;flex:none;font-size:1rem;padding:0;border-radius:0 12px 12px 0}
+.tile.bought{opacity:.5;background:var(--done);border-color:transparent}
+.tile.bought .tn{text-decoration:line-through;font-weight:400}
+.tile.bought .dot{background:var(--muted);border-color:var(--muted)}
+.tile.bought .dot svg{opacity:1}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -258,7 +279,15 @@ const clean = o => JSON.parse(JSON.stringify(o));
 const CHECK = '<svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 7"/></svg>';
 const fmtTime = t => {const d=new Date(t);return (d.getMonth()+1)+"/"+d.getDate()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");};
 const fmtDate = t => {const d=new Date(t);return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();};
-function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+function toast(msg,undo){
+  document.querySelectorAll(".toast").forEach(x=>x.remove());
+  const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");
+  const s=document.createElement("span");s.textContent=msg;t.appendChild(s);
+  if(undo){const b=document.createElement("button");b.type="button";b.textContent="元に戻す";b.onclick=()=>{t.remove();undo();};t.appendChild(b);}
+  document.body.appendChild(t);setTimeout(()=>t.remove(),undo?5000:2600);
+}
+const TRASH='<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+const splitNames = s => [...new Set(String(s).split(/[\s　、,，]+/).map(x=>x.trim()).filter(Boolean))];
 function randRoom(){const a=new Uint8Array(12);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(36).padStart(2,"0")).join("").slice(0,24);}
 async function copyText(text,okMsg){
   try{await navigator.clipboard.writeText(text);toast(okMsg||"コピーしました");return true;}catch(e){}
@@ -269,7 +298,8 @@ const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").repla
 const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
 
 // ================= state =================
-const S = {menus:[],shop:[],history:[],cache:{},week:null};
+const AISLES_DEFAULT=["野菜・果物","肉","魚","豆腐・納豆・練り物","卵・乳製品","パン・麺・米","調味料","乾物・缶詰","冷凍食品","お菓子・飲み物","日用品"];
+const S = {menus:[],shop:[],history:[],cache:{},week:null,aisles:AISLES_DEFAULT.slice(),aisleMap:{}};
 let screen="loading", tab=ls.get("kondate.tab","chat");
 let myName=ls.get("kondate.name","");
 let mode=ls.get("kondate.mode",null);       // "firebase" | "local" | null
@@ -345,7 +375,9 @@ async function connectFirebase(cfg,room){
 // ================= Gemini (direct fetch, key kept in this device) =================
 const GEMINI_BASE="https://generativelanguage.googleapis.com/v1beta/models/";
 const MODEL_DEFAULT="gemini-2.5-flash", MODEL_FALLBACKS=["gemini-3-flash-preview","gemini-flash-latest"];
-const PROMPT="以下の料理を作るために必要な一般的な食材名のみをJSONの文字列配列（例: [\"豚肉\", \"玉ねぎ\", \"人参\"]）で出力してください。余計な解説は不要です。料理名: ";
+const aisleRule=()=>"売り場は次の名前の中から1つをそのまま選んでください（どれにも当てはまらなければ「その他」）: "+S.aisles.join("、")+"。";
+const promptDecompose=name=>"以下の料理を作るために必要な一般的な食材を挙げ、スーパーの売り場ごとに分類してください。"+aisleRule()+"出力はJSON配列のみで、形式は [{\"name\":\"豚肉\",\"aisle\":\"肉\"},{\"name\":\"玉ねぎ\",\"aisle\":\"野菜・果物\"}] です。余計な解説は不要です。料理名: "+name;
+const promptClassify=names=>"次の食材を、スーパーの売り場ごとに分類してください。"+aisleRule()+"出力はJSON配列のみで、形式は [{\"name\":\"牛乳\",\"aisle\":\"卵・乳製品\"}] です。食材名は入力のまま変えないでください。余計な解説は不要です。食材: "+names.join("、");
 let geminiKey=ls.get("kondate.geminiKey",""), modelName=ls.get("kondate.model",MODEL_DEFAULT), aiFails=0;
 const aiReady=()=>!!geminiKey;
 async function geminiOnce(model,prompt,key){
@@ -375,10 +407,67 @@ async function callGemini(prompt,key){
   }
   throw lastErr;
 }
-function parseArr(txt){
+// Accepts [{"name","aisle"}] (current prompt) or ["name"] (older style). Returns [{name,aisle}] or null.
+function parseItems(txt){
   const m=String(txt||"").replace(/```(?:json)?/g,"").match(/\[[\s\S]*\]/);
   if(!m) return null;
-  try{const a=JSON.parse(m[0]);return Array.isArray(a)&&a.every(x=>typeof x==="string")?a:null;}catch(e){return null;}
+  let a; try{a=JSON.parse(m[0]);}catch(e){return null;}
+  if(!Array.isArray(a)) return null;
+  const out=[];
+  for(const x of a){
+    if(typeof x==="string"&&x.trim()) out.push({name:x.trim(),aisle:""});
+    else if(x&&typeof x==="object"&&typeof x.name==="string"&&x.name.trim()) out.push({name:x.name.trim(),aisle:typeof x.aisle==="string"?x.aisle.trim():""});
+  }
+  return out.length?out:null;
+}
+
+// ================= supermarket aisles =================
+// Fallback guess when AI is off or hasn't answered yet. Each group's k = words to find in the user's aisle names.
+const CATS=[
+  {k:["野菜","青果","果物"],w:["玉ねぎ","たまねぎ","人参","にんじん","じゃがいも","キャベツ","白菜","大根","ねぎ","ごぼう","れんこん","なす","ピーマン","トマト","きゅうり","レタス","もやし","にら","ほうれん草","小松菜","ブロッコリー","かぼちゃ","さつまいも","里芋","しめじ","しいたけ","えのき","まいたけ","エリンギ","きのこ","生姜","しょうが","にんにく","三つ葉","いんげん","レモン","りんご","バナナ","みかん","大葉","パセリ","セロリ","アボカド","オクラ","枝豆","水菜","豆苗","野菜","いちご","ぶどう","アスパラ","パプリカ","ズッキーニ","ニラ"]},
+  {k:["肉","精肉"],w:["肉","ひき肉","ベーコン","ウインナー","ソーセージ","ハム","焼豚","チャーシュー","ロース","ささみ","手羽"]},
+  {k:["魚","鮮魚","水産"],w:["鮭","サーモン","サバ","さば","ぶり","えび","海老","いか","たこ","あさり","しじみ","まぐろ","刺身","たら","さんま","いわし","ほたて","しらす","魚","かに","明太子","たらこ"]},
+  {k:["豆腐","納豆","練り物","日配"],w:["豆腐","納豆","油揚げ","厚揚げ","こんにゃく","しらたき","ちくわ","かまぼこ","はんぺん","さつま揚げ","キムチ","漬物","餃子の皮","紅しょうが"]},
+  {k:["卵","乳"],w:["卵","たまご","牛乳","バター","チーズ","ヨーグルト","生クリーム","マーガリン"]},
+  {k:["パン","麺","米"],w:["パン","うどん","そば","中華麺","スパゲッティ","パスタ","マカロニ","ごはん","ご飯","米","餅","ラーメン","焼きそば"]},
+  {k:["調味料","粉"],w:["醤油","しょうゆ","味噌","みそ","塩","砂糖","酢","みりん","料理酒","ケチャップ","マヨネーズ","ソース","ルー","コンソメ","だし","豆板醤","甜麺醤","オイル","サラダ油","ごま油","片栗粉","小麦粉","天ぷら粉","パン粉","鍋つゆ","ドレッシング","ポン酢","めんつゆ","こしょう","胡椒","カレー粉","鶏ガラ"]},
+  {k:["乾物","缶"],w:["のり","海苔","わかめ","ひじき","昆布","かつお節","鰹節","ツナ","缶","ごま","春雨","切り干し","高野豆腐","ふりかけ"]},
+  {k:["冷凍"],w:["冷凍"]},
+  {k:["菓子","飲み物","飲料"],w:["お菓子","チョコ","ジュース","お茶","コーヒー","ビール","炭酸","ミネラルウォーター"]},
+  {k:["日用品"],w:["ティッシュ","洗剤","トイレットペーパー","ラップ","アルミホイル","ゴミ袋","シャンプー","電池"]}
+];
+const CAT_WORDS=CATS.flatMap((c,i)=>c.w.map(w=>[w,i])).sort((a,b)=>b[0].length-a[0].length);
+function guessAisle(name){
+  const n=norm(name); const hit=CAT_WORDS.find(([w])=>n.includes(w));
+  if(!hit) return "その他";
+  const keys=CATS[hit[1]].k; const a=S.aisles.find(x=>keys.some(k=>x.includes(k)));
+  return a||"その他";
+}
+const validAisle=a=>!!a&&S.aisles.includes(a);
+function aisleOf(x){
+  if(validAisle(x.aisle)) return x.aisle;
+  const m=S.aisleMap[norm(x.name)]; if(validAisle(m)) return m;
+  return guessAisle(x.name);
+}
+const shopDoc=x=>({name:x.name,tags:x.tags||[],checked:!!x.checked,aisle:x.aisle||""});
+let classifying=false;
+// Ask Gemini (in the background) for the aisle of any unchecked item whose aisle isn't one of the current aisle names.
+async function classifyMissing(){
+  if(!aiReady()||classifying) return;
+  const todo=S.shop.filter(x=>!x.checked&&!validAisle(x.aisle)&&!validAisle(S.aisleMap[norm(x.name)]));
+  if(!todo.length) return;
+  classifying=true;
+  try{
+    const arr=parseItems(await callGemini(promptClassify(todo.slice(0,40).map(x=>x.name))));
+    for(const it of arr||[]){
+      const x=todo.find(t=>norm(t.name)===norm(it.name));
+      if(!x||!validAisle(it.aisle)) continue;
+      S.aisleMap[norm(x.name)]=it.aisle;
+      const cur=S.shop.find(s=>s.id===x.id); if(!cur) continue;
+      await store.set("shop",x.id,{...shopDoc(cur),aisle:it.aisle}).catch(()=>{});
+    }
+  }catch(e){console.warn("classify",e);}
+  finally{classifying=false;}
 }
 function aiErrText(e){
   if(e&&(e.status===400||e.status===401||e.status===403)) return "APIキーが正しくないようです。Google AI Studioでキーを確認してください。";
@@ -405,12 +494,14 @@ async function decompose(name){
   if(fromHist) return {ings:fromHist.ings,src:"history"};
   if(aiReady()){
     try{
-      const arr=parseArr(await callGemini(PROMPT+name));
+      const arr=parseItems(await callGemini(promptDecompose(name)));
       if(arr&&arr.length){
-        const ings=[...new Set(arr.map(s=>s.trim()).filter(Boolean))].slice(0,12);
+        const seen=new Set(), ings=[], aisles={};
+        for(const it of arr){ if(seen.has(it.name)) continue; seen.add(it.name); ings.push(it.name); if(it.aisle){aisles[it.name]=it.aisle;S.aisleMap[norm(it.name)]=it.aisle;} }
+        ings.splice(12);
         S.cache[key]=ings;
-        store.set("cache",hid(key),{name:key,ings,at:Date.now()}).catch(()=>{});
-        return {ings,src:"ai"};
+        store.set("cache",hid(key),{name:key,ings,aisles,at:Date.now()}).catch(()=>{});
+        return {ings,aisles,src:"ai"};
       }
       aiFails++;
     }catch(e){aiFails++;console.warn("Gemini:",e);}
@@ -426,23 +517,82 @@ async function addDishesToShop(dishes){
     if(r.src==="generic") generic.push(d.name);
     for(const ing of r.ings){
       const id=hid(ing);
-      const cur=merged[id]||S.shop.find(x=>x.id===id)||{name:ing,tags:[],checked:false};
-      merged[id]={name:cur.name,tags:[...new Set([...(cur.tags||[]),d.name])],checked:false};
+      const cur=merged[id]||S.shop.find(x=>x.id===id)||{name:ing,tags:[],checked:false,aisle:""};
+      const aisle=(r.aisles&&r.aisles[ing])||cur.aisle||S.aisleMap[norm(ing)]||"";
+      merged[id]={name:cur.name,tags:[...new Set([...(cur.tags||[]),d.name])],checked:false,aisle};
     }
   }
   for(const [id,v] of Object.entries(merged)){ await store.set("shop",id,v).catch(()=>{}); }
+  classifyMissing();
   return generic;
 }
 
 // ================= UI shell =================
 const whoName=id=>!id?"":(id===myName?"わたし":id);
-function setTab(t){tab=t;ls.set("kondate.tab",t);confirmDone=false;render();$("#main").scrollTop=0;if(t==="chat")scrollChatEnd();}
+function setTab(t){tab=t;ls.set("kondate.tab",t);confirmDone=false;confirmClear=false;openSwipe=null;render();$("#main").scrollTop=0;if(t==="chat")scrollChatEnd();}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 const selected=new Set();
-let busy=false,confirmDone=false,showHistForm=false,boughtOpen=false;
+let busy=false,confirmDone=false,confirmClear=false,showHistForm=false,boughtOpen=false;
 
-function saveInputs(){const o={};document.querySelectorAll("#main input,#main textarea,#overlay input").forEach(i=>{if(i.id)o[i.id]={v:i.value,f:document.activeElement===i,s:i.selectionStart,e:i.selectionEnd};});return o;}
-function restoreInputs(o){for(const [id,x] of Object.entries(o)){const i=document.getElementById(id);if(!i)continue;i.value=x.v;if(x.f){i.focus({preventScroll:true});try{i.setSelectionRange(x.s,x.e);}catch(e){}}}}
+function saveInputs(){const o={};document.querySelectorAll("#main input,#main textarea,#overlay input,#overlay textarea").forEach(i=>{if(i.id)o[i.id]={v:i.value,f:document.activeElement===i,s:i.selectionStart,e:i.selectionEnd};});return o;}
+function restoreInputs(o){for(const [id,x] of Object.entries(o)){const i=document.getElementById(id);if(!i)continue;i.value=x.v;if(i.tagName==="TEXTAREA"&&i.dataset.grow!=null)grow(i);if(x.f){i.focus({preventScroll:true});try{i.setSelectionRange(x.s,x.e);}catch(e){}}}}
+function grow(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight+4,132)+"px";}
+
+// ================= swipe left to delete (chat & history) =================
+// Row markup: .swipe[data-swipe="col:id"] > button.swipe-del + .swipe-fg. Handlers are delegated on #main (bound once).
+let openSwipe=null, swipeDrag=null, eatClick=false;
+const SW_W=92;
+function swipeWrap(key,inner){
+  return '<div class="swipe'+(openSwipe===key?' open':'')+'" data-swipe="'+esc(key)+'"><button class="swipe-del" data-swdel="'+esc(key)+'" type="button" aria-label="削除">'+TRASH+'削除</button><div class="swipe-fg">'+inner+'</div></div>';
+}
+function closeSwipes(){openSwipe=null;document.querySelectorAll(".swipe.open").forEach(x=>x.classList.remove("open"));}
+(function bindSwipe(){
+  const main=$("#main");
+  main.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="mouse"&&e.button!==0) return;
+    const fg=e.target.closest(".swipe-fg"); if(!fg){swipeDrag=null;return;}
+    const row=fg.parentElement;
+    swipeDrag={fg,row,key:row.dataset.swipe,x:e.clientX,y:e.clientY,base:row.classList.contains("open")?-SW_W:0,t:0,active:false,id:e.pointerId};
+  });
+  main.addEventListener("pointermove",e=>{
+    const d=swipeDrag; if(!d||e.pointerId!==d.id) return;
+    const dx=e.clientX-d.x, dy=e.clientY-d.y;
+    if(!d.active){
+      if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2){d.active=true;d.fg.style.transition="none";try{d.fg.setPointerCapture(e.pointerId);}catch(err){}}
+      else if(Math.abs(dy)>10){swipeDrag=null;return;}
+      else return;
+    }
+    d.t=Math.min(0,Math.max(-SW_W*1.5,d.base+dx));
+    d.fg.style.transform="translateX("+d.t+"px)";
+  });
+  const end=e=>{
+    const d=swipeDrag; if(!d||e.pointerId!==d.id) return; swipeDrag=null;
+    if(!d.active) return;
+    d.fg.style.transition=""; d.fg.style.transform="";
+    const open=d.t<-SW_W/2;
+    closeSwipes();
+    if(open){openSwipe=d.key;d.row.classList.add("open");}
+    eatClick=true; setTimeout(()=>{eatClick=false;},350);
+  };
+  main.addEventListener("pointerup",end);
+  main.addEventListener("pointercancel",e=>{const d=swipeDrag;if(d&&d.active){d.fg.style.transition="";d.fg.style.transform="";}swipeDrag=null;});
+  // Capture phase: swallow the click that ends a drag, and let a tap anywhere else just close an open row.
+  main.addEventListener("click",e=>{
+    if(eatClick){eatClick=false;e.stopPropagation();e.preventDefault();return;}
+    const del=e.target.closest("[data-swdel]");
+    if(del){e.stopPropagation();e.preventDefault();const [col,...rest]=del.dataset.swdel.split(":");const id=rest.join(":");const row=(S[col]||[]).find(r=>r.id===id);openSwipe=null;if(row)removeDocs(col,[row],col==="history"?"「"+row.name+"」を履歴から消しました":"チャットから消しました");return;}
+    if(openSwipe){e.stopPropagation();e.preventDefault();closeSwipes();}
+  },true);
+})();
+// Remove rows right away, then offer "元に戻す" which writes the same documents back.
+async function removeDocs(col,rows,msg){
+  if(!rows.length) return;
+  const ids=new Set(rows.map(r=>r.id));
+  S[col]=S[col].filter(r=>!ids.has(r.id)); ids.forEach(id=>selected.delete(id));
+  render();
+  toast(msg,()=>{for(const r of rows){const {id,...d}=r;store.set(col,id,d).catch(()=>{});}});
+  await Promise.all(rows.map(r=>store.del(col,r.id).catch(()=>{})));
+}
 
 function render(){
   document.body.dataset.screen=screen;
@@ -543,15 +693,18 @@ function bindError(){
 // ================= chat =================
 function chatView(){
   const msgs=[...S.menus].sort((a,b)=>a.at-b.at);
-  if(!msgs.length) return '<div class="empty">まだ献立がありません。<br>下の入力欄に「肉じゃが」のように書いて<br>送ってみましょう。</div>';
-  return '<div class="chat">'+msgs.map(m=>{
+  if(!msgs.length) return '<div class="empty">まだ献立がありません。<br>下の入力欄に「肉じゃが」のように書いて<br>送ってみましょう。<br><br>スペースや改行で区切ると、<br>いくつも一度に送れます。</div>';
+  const bar=confirmClear
+    ?'<div class="confirm" style="margin-bottom:12px"><b>チャットを全部消しますか？</b><span style="font-size:.88rem">献立のやりとりだけを消します。買い物リストと履歴は消えません。</span><div class="row"><button class="btn ghost" id="clrNo" style="flex:1" type="button">やめる</button><button class="btn" id="clrYes" style="flex:1" type="button">全部消す</button></div></div>'
+    :'<div class="hint"><span>← 左にスライドすると1件ずつ消せます</span><button class="linkbtn" id="clrAll" type="button">全部消す</button></div>';
+  return bar+'<div class="chat">'+msgs.map(m=>{
     const mine=m.by===myName; const nm=whoName(m.by)||"";
     const head='<div class="who">'+esc(nm)+' ・ '+fmtTime(m.at)+'</div>';
     const ava='<div class="ava" aria-hidden="true">'+esc((mine?myName:(m.by||"?")).slice(0,1))+'</div>';
-    if(m.type==="note") return '<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+'<div class="note">'+esc(m.text)+'</div></div></div>';
+    if(m.type==="note") return swipeWrap("menus:"+m.id,'<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+'<div class="note">'+esc(m.text)+'</div></div></div>');
     const sel=selected.has(m.id);
-    return '<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+
-      '<button class="card '+(sel?"sel":"")+'" data-sel="'+esc(m.id)+'" aria-pressed="'+sel+'" type="button"><span class="box">'+CHECK+'</span><span><span class="dish">'+esc(m.name)+'</span>'+(m.done?' <span class="chip">完了済み</span>':'')+'</span></button></div></div>';
+    return swipeWrap("menus:"+m.id,'<div class="msg '+(mine?"me":"")+'">'+ava+'<div class="bubble">'+head+
+      '<button class="card '+(sel?"sel":"")+'" data-sel="'+esc(m.id)+'" aria-pressed="'+sel+'" type="button"><span class="box">'+CHECK+'</span><span><span class="dish">'+esc(m.name)+'</span>'+(m.done?' <span class="chip">完了済み</span>':'')+'</span></button></div></div>');
   }).join("")+'</div>';
 }
 function chatOverlay(){
@@ -561,18 +714,36 @@ function chatOverlay(){
     return '<button class="btn fab" id="toShop" type="button" '+(busy?"disabled":"")+'>'+(busy?'<span class="spin"></span>食材を考えています…':'選択した'+n+'件の献立で買い物リストを作る →')+'</button>';
   }
   return '<div class="composer">'+(recent.length?'<div class="quick" aria-label="最近の献立から選ぶ">'+recent.map(r=>'<button data-quick="'+esc(r)+'" type="button">'+esc(r)+'</button>').join("")+'</div>':'')+
-    '<form class="row" id="sendForm"><input type="text" id="dishIn" placeholder="食べたい献立を書く（例：肉じゃが）" autocomplete="off" enterkeyhint="send"><button class="btn" type="submit" aria-label="送信"><svg class="i" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></form></div>';
+    '<form class="row" id="sendForm"><textarea id="dishIn" rows="1" data-grow placeholder="献立を書く（複数OK）" autocomplete="off" aria-label="献立を書く"></textarea><button class="btn" type="submit" aria-label="送信"><svg class="i" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></form></div>';
 }
 async function postDish(name){
   name=String(name).trim(); if(!name) return;
   await store.set("menus",uid(),{type:"dish",name,by:myName,at:Date.now(),done:false}).catch(()=>{});
   scrollChatEnd();
 }
+// "肉じゃが 味噌汁\n鮭の塩焼き" → three separate dish messages, kept in the typed order.
+async function postDishes(text){
+  const names=splitNames(text); if(!names.length) return;
+  const now=Date.now();
+  await Promise.all(names.map((name,i)=>store.set("menus",uid(),{type:"dish",name,by:myName,at:now+i,done:false}).catch(()=>{})));
+  scrollChatEnd();
+  if(names.length>1) toast(names.length+"件送りました");
+}
 function scrollChatEnd(){requestAnimationFrame(()=>{const m=$("#main");m.scrollTop=m.scrollHeight;});}
 function bindChat(){
   document.querySelectorAll("[data-sel]").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.sel;selected.has(id)?selected.delete(id):selected.add(id);render();}));
   document.querySelectorAll("[data-quick]").forEach(b=>b.addEventListener("click",()=>postDish(b.dataset.quick)));
-  const f=$("#sendForm"); if(f) f.addEventListener("submit",e=>{e.preventDefault();const i=$("#dishIn");const v=i.value;i.value="";postDish(v);});
+  const f=$("#sendForm"); if(f){
+    const i=$("#dishIn");
+    const send=()=>{const v=i.value;i.value="";grow(i);postDishes(v);};
+    f.addEventListener("submit",e=>{e.preventDefault();send();});
+    i.addEventListener("input",()=>grow(i));
+    // On a computer, Enter sends (Shift+Enter = new line). On phones, Enter is a new line and the button sends.
+    i.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229&&matchMedia("(pointer:fine)").matches){e.preventDefault();send();}});
+  }
+  const ca=$("#clrAll"); if(ca) ca.addEventListener("click",()=>{confirmClear=true;render();});
+  const cn=$("#clrNo"); if(cn) cn.addEventListener("click",()=>{confirmClear=false;render();});
+  const cy=$("#clrYes"); if(cy) cy.addEventListener("click",()=>{confirmClear=false;removeDocs("menus",[...S.menus],"チャットを全部消しました");});
   const t=$("#toShop"); if(t) t.addEventListener("click",async()=>{
     busy=true;render();
     const dishes=S.menus.filter(m=>selected.has(m.id)).map(m=>({name:m.name}));
@@ -586,25 +757,35 @@ function bindChat(){
 
 // ================= shopping =================
 function shopView(){
-  const all=S.shop; const todo=all.filter(x=>!x.checked).sort((a,b)=>a.name.localeCompare(b.name,"ja")); const done=all.filter(x=>x.checked);
-  if(!all.length) return '<h2>買い物リスト</h2><p class="lead">チャットで献立にチェックを入れると、食材がここに並びます。</p><div class="empty">リストは空です</div>'+addForm();
+  const all=S.shop; const todo=all.filter(x=>!x.checked); const done=all.filter(x=>x.checked).sort((a,b)=>a.name.localeCompare(b.name,"ja"));
+  if(!all.length) return '<h2>買い物リスト</h2><p class="lead">チャットで献立にチェックを入れると、食材がここに並びます。並び順は設定（右上の歯車）の「売り場の順番」で変えられます。</p><div class="empty">リストは空です</div>'+addForm();
   const pct=Math.round(done.length/all.length*100);
-  const row=(x,b)=>'<div class="item '+(b?"bought":"")+'"><button class="box" data-ck="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を'+(b?"未購入に戻す":"買った")+'" type="button">'+CHECK+'</button><button class="txt" data-ck="'+esc(x.id)+'" type="button"><div class="nm">'+esc(x.name)+'</div>'+(b?'':'<div class="tags">'+(x.tags||[]).map(t=>'<span class="chip terra">'+esc(t)+'</span>').join("")+'</div>')+'</button><button class="x" data-rm="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を削除" type="button">×</button></div>';
+  const tile=(x,b)=>'<div class="tile '+(b?"bought":"")+'"><button class="tb" data-ck="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を'+(b?"未購入に戻す":"買った")+'" type="button"><span class="dot">'+CHECK+'</span><span class="tw"><span class="tn">'+esc(x.name)+'</span>'+(()=>{const t=(x.tags||[]).filter(t=>t!=="手で追加");return !b&&t.length?'<span class="tt">'+esc(t.join("・"))+'</span>':'';})()+'</span></button><button class="tx" data-rm="'+esc(x.id)+'" aria-label="'+esc(x.name)+'を消す" type="button">×</button></div>';
+  // Group by aisle in the user's store order; anything unknown goes to "その他" at the end.
+  const order=[...S.aisles,"その他"], groups={};
+  for(const x of todo){const a=aisleOf(x);(groups[a]=groups[a]||[]).push(x);}
   let h='<div class="progress"><div class="nums"><span>買い物の進み具合</span><span><b>'+done.length+'</b> / '+all.length+' 完了</span></div><div class="bar"><i style="width:'+pct+'%"></i></div></div>';
-  h+='<div class="items">'+(todo.length?todo.map(x=>row(x,false)).join(""):'<div class="empty" style="padding:20px">全部そろいました！</div>')+'</div>';
+  if(todo.length){
+    h+=order.filter(a=>groups[a]).map(a=>'<section class="aisle"><div class="ah">'+esc(a)+' <span>'+groups[a].length+'</span></div><div class="tiles">'+groups[a].sort((p,q)=>p.name.localeCompare(q.name,"ja")).map(x=>tile(x,false)).join("")+'</div></section>').join("");
+  } else h+='<div class="empty" style="padding:20px">全部そろいました！</div>';
   h+=addForm();
-  if(done.length) h+='<details class="boughtArea" id="boughtArea" '+(boughtOpen?"open":"")+'><summary>✓ 買ったもの（'+done.length+'）をみる</summary><div class="items">'+done.map(x=>row(x,true)).join("")+'</div></details>';
+  if(done.length) h+='<details class="boughtArea" id="boughtArea" '+(boughtOpen?"open":"")+'><summary>✓ 買ったもの（'+done.length+'）をみる</summary><div class="tiles">'+done.map(x=>tile(x,true)).join("")+'</div></details>';
   h+='<div class="actions">'+(confirmDone?
     '<div class="confirm"><b>買い物を完了しますか？</b><span style="font-size:.88rem">リストを空にして、献立を履歴に残します。</span><div class="row"><button class="btn ghost" id="noDone" style="flex:1" type="button">やめる</button><button class="btn sage" id="yesDone" style="flex:1" type="button">完了する</button></div></div>'
     :'<button class="btn sage block" id="doneBtn" type="button">買い物を完了する</button>')+'</div>';
   return h;
 }
-function addForm(){return '<form class="addform" id="addForm"><input type="text" id="addIn" placeholder="＋ 食材を手で追加（例：牛乳）" autocomplete="off"><button class="btn ghost" type="submit">追加</button></form>';}
+function addForm(){return '<form class="addform" id="addForm"><input type="text" id="addIn" placeholder="＋ 食材を手で追加（例：牛乳 卵）" autocomplete="off"><button class="btn ghost" type="submit">追加</button></form>';}
 function bindShop(){
-  document.querySelectorAll("[data-ck]").forEach(b=>b.addEventListener("click",()=>{const x=S.shop.find(i=>i.id===b.dataset.ck);if(!x)return;x.checked=!x.checked;render();store.set("shop",x.id,{name:x.name,tags:x.tags||[],checked:x.checked}).catch(()=>{});}));
-  document.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{S.shop=S.shop.filter(i=>i.id!==b.dataset.rm);render();store.del("shop",b.dataset.rm).catch(()=>{});}));
+  document.querySelectorAll("[data-ck]").forEach(b=>b.addEventListener("click",()=>{const x=S.shop.find(i=>i.id===b.dataset.ck);if(!x)return;x.checked=!x.checked;render();store.set("shop",x.id,shopDoc(x)).catch(()=>{});}));
+  document.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{const x=S.shop.find(i=>i.id===b.dataset.rm);if(!x)return;S.shop=S.shop.filter(i=>i.id!==x.id);render();toast("「"+x.name+"」を消しました",()=>store.set("shop",x.id,shopDoc(x)).catch(()=>{}));store.del("shop",x.id).catch(()=>{});}));
   const ba=$("#boughtArea"); if(ba) ba.addEventListener("toggle",()=>{boughtOpen=ba.open;});
-  $("#addForm").addEventListener("submit",e=>{e.preventDefault();const v=$("#addIn").value.trim();if(!v)return;$("#addIn").value="";const id=hid(v);const cur=S.shop.find(i=>i.id===id);store.set("shop",id,{name:v,tags:cur?cur.tags:["手で追加"],checked:false}).catch(()=>{});});
+  $("#addForm").addEventListener("submit",async e=>{
+    e.preventDefault();const names=splitNames($("#addIn").value);if(!names.length)return;$("#addIn").value="";
+    await Promise.all(names.map(v=>{const id=hid(v);const cur=S.shop.find(i=>i.id===id);
+      return store.set("shop",id,{name:cur?cur.name:v,tags:cur?(cur.tags||[]):["手で追加"],checked:false,aisle:(cur&&cur.aisle)||S.aisleMap[norm(v)]||""}).catch(()=>{});}));
+    classifyMissing();
+  });
   const d=$("#doneBtn"); if(d) d.addEventListener("click",()=>{confirmDone=true;render();});
   const n=$("#noDone"); if(n) n.addEventListener("click",()=>{confirmDone=false;render();});
   const y=$("#yesDone"); if(y) y.addEventListener("click",completeShopping);
@@ -627,12 +808,12 @@ async function completeShopping(){
 // ================= history =================
 function histView(){
   const hs=[...S.history].sort((a,b)=>b.at-a.at);
-  let h='<h2>献立履歴</h2><p class="lead">買い物を完了した献立がたまっていきます。「7日おまかせ」はここから選びます。</p>';
+  let h='<h2>献立履歴</h2><p class="lead">買い物を完了した献立がたまっていきます。「7日おまかせ」はここから選びます。<br>← 左にスライドすると消せます。</p>';
   h+= showHistForm
     ? '<form class="hcard" id="histForm" style="margin-bottom:12px"><b>履歴に手で登録</b><input type="text" id="hName" placeholder="献立名（例：筑前煮）" autocomplete="off"><input type="text" id="hIngs" placeholder="食材を「、」で区切る（空なら自動）" autocomplete="off"><div class="row"><button type="button" class="btn ghost" id="hCancel" style="flex:1">やめる</button><button class="btn" type="submit" style="flex:1">登録</button></div></form>'
     : '<button class="btn ghost block" id="hOpen" type="button" style="margin-bottom:12px">＋ 履歴に手で献立を登録</button>';
   if(!hs.length) return h+'<div class="empty">まだ履歴はありません</div>';
-  h+='<div class="stack">'+hs.map(x=>'<div class="hcard"><div class="top"><span class="dish">'+esc(x.name)+(x.sample?' <span class="chip">例</span>':'')+'</span><span class="meta">'+fmtDate(x.at)+(x.by?' ・ '+esc(whoName(x.by)):'')+'</span></div><div class="tags">'+(x.ings||[]).map(i=>'<span class="chip">'+esc(i)+'</span>').join("")+'</div><div class="row"><button class="hbtn" data-again="'+esc(x.id)+'" type="button">＋ 買い物リストに追加</button><button class="hbtn" data-post="'+esc(x.id)+'" type="button" style="color:var(--sage)">チャットに出す</button></div></div>').join("")+'</div>';
+  h+='<div class="stack">'+hs.map(x=>swipeWrap("history:"+x.id,'<div class="hcard"><div class="top"><span class="dish">'+esc(x.name)+(x.sample?' <span class="chip">例</span>':'')+'</span><span class="meta">'+fmtDate(x.at)+(x.by?' ・ '+esc(whoName(x.by)):'')+'</span></div><div class="tags">'+(x.ings||[]).map(i=>'<span class="chip">'+esc(i)+'</span>').join("")+'</div><div class="row"><button class="hbtn" data-again="'+esc(x.id)+'" type="button">＋ 買い物リストに追加</button><button class="hbtn" data-post="'+esc(x.id)+'" type="button" style="color:var(--sage)">チャットに出す</button></div></div>')).join("")+'</div>';
   return h;
 }
 function bindHist(){
@@ -701,7 +882,7 @@ function bindWeek(){
 // ================= settings modal =================
 function openSettings(){
   const ov=document.createElement("div");ov.className="modalwrap";
-  let confirmLeave=false;
+  let confirmLeave=false, aisleDraft=S.aisles.join("\n");
   const draw=()=>{
     const link=inviteLink();
     ov.innerHTML='<div class="modal" role="dialog" aria-label="設定"><h3>設定</h3>'+
@@ -715,6 +896,10 @@ function openSettings(){
       '<div class="row"><button class="btn" id="keySave" type="button" style="flex:1">保存</button><button class="btn ghost" id="keyTest" type="button" style="flex:1">接続テスト</button></div>'+
       (geminiKey?'<button class="btn ghost block" id="keyDel" type="button">キーを消して辞書モードに戻す</button>':'')+
       '<div id="keyMsg" class="msgline" role="status"></div><span class="muted" style="font-size:.78rem">使用モデル：'+esc(modelName)+'</span></div>'+
+    '<div class="set"><b>売り場の順番</b><span class="muted">よく行くスーパーを回る順に、売り場を1行にひとつずつ書いてください。買い物リストがこの順に並びます。ふたりで共通の設定です。</span>'+
+      '<textarea id="aisleIn" class="plain" rows="8" spellcheck="false">'+esc(aisleDraft)+'</textarea>'+
+      '<div class="row"><button class="btn" id="aisleSave" type="button" style="flex:1">順番を保存</button><button class="btn ghost" id="aisleReset" type="button" style="flex:1">はじめの順に戻す</button></div>'+
+      '<span class="muted" style="font-size:.78rem">AI分解モードでは、AIがこの売り場名で食材を分けます。辞書モードでは、よくある食材だけを自動で振り分けます。</span></div>'+
     (mode==="firebase"
       ?'<div class="set"><b>この端末の接続</b>'+(confirmLeave?'<span class="muted">この端末の設定を消します。献立のデータは消えません。もう一度つなぐには招待リンクが必要です。</span><div class="row"><button class="btn ghost" id="leaveNo" type="button" style="flex:1">やめる</button><button class="btn" id="leaveYes" type="button" style="flex:1">解除する</button></div>':'<button class="btn ghost block" id="leave" type="button">接続を解除する</button>')+'</div>':'')+
     '<div class="set"><b>辞書に入っている料理（'+Object.keys(DICT).length+'品）</b><span class="muted">'+esc(Object.keys(DICT).join("・"))+'</span></div>'+
@@ -730,9 +915,19 @@ function openSettings(){
       const v=q("#keyIn").value.trim();
       if(!v){msg("先にキーを入れてください。");return;}
       q("#keyMsg").className="msgline"; msg("Geminiに問い合わせています…");
-      try{const arr=parseArr(await callGemini(PROMPT+"カレー",v));const m=q("#keyMsg");if(arr&&arr.length){m.className="msgline ok";m.textContent="つながりました（"+modelName+"）。カレー → "+arr.join("、");}else{m.className="msgline err";m.textContent="つながりましたが、答えの形が想定と違いました。";}}
+      try{const arr=parseItems(await callGemini(promptDecompose("カレー"),v));const m=q("#keyMsg");if(arr&&arr.length){m.className="msgline ok";m.textContent="つながりました（"+modelName+"）。カレー → "+arr.map(x=>x.name+(x.aisle?"（"+x.aisle+"）":"")).join("、");}else{m.className="msgline err";m.textContent="つながりましたが、答えの形が想定と違いました。";}}
       catch(e){const m=q("#keyMsg");m.className="msgline err";m.textContent=aiErrText(e);}
     };
+    q("#aisleIn").oninput=e=>{aisleDraft=e.target.value;};
+    const saveAisles=async list=>{
+      list=[...new Set(list.map(x=>x.trim()).filter(Boolean))].slice(0,30);
+      if(!list.length){toast("売り場を1つ以上書いてください");return;}
+      S.aisles=list; aisleDraft=list.join("\n"); draw(); render();
+      await store.set("settings","aisles",{list,at:Date.now()}).catch(()=>{});
+      toast("売り場の順番を保存しました"); classifyMissing();
+    };
+    q("#aisleSave").onclick=()=>saveAisles(q("#aisleIn").value.split(/\n+/));
+    q("#aisleReset").onclick=()=>saveAisles(AISLES_DEFAULT.slice());
     if(q("#keyDel")) q("#keyDel").onclick=()=>{geminiKey="";ls.set("kondate.geminiKey","");draw();render();};
     if(q("#leave")) q("#leave").onclick=()=>{confirmLeave=true;draw();};
     if(q("#leaveNo")) q("#leaveNo").onclick=()=>{confirmLeave=false;draw();};
@@ -744,7 +939,7 @@ $("#gear").addEventListener("click",openSettings);
 $("#syncBadge").addEventListener("click",()=>{if(screen==="app")openSettings();});
 
 // ================= boot =================
-function resetData(){S.menus=[];S.shop=[];S.history=[];S.cache={};S.week=null;seedTried=false;}
+function resetData(){S.menus=[];S.shop=[];S.history=[];S.cache={};S.week=null;S.aisles=AISLES_DEFAULT.slice();S.aisleMap={};seedTried=false;}
 async function seedIfNeeded(){
   try{
     if(await store.get("meta","seeded")) return;
@@ -760,7 +955,8 @@ function subscribeAll(){
   store.listen("menus",rows=>{S.menus=rows;const grew=rows.length>lastMenuCount;lastMenuCount=rows.length;render();if(tab==="chat"&&grew&&screen==="app")scrollChatEnd();});
   store.listen("shop",rows=>{S.shop=rows;render();});
   store.listen("history",(rows,fromCache)=>{S.history=rows;render();if(!fromCache&&!seedTried){seedTried=true;seedIfNeeded();}});
-  store.listen("cache",rows=>{for(const r of rows) if(r.name&&Array.isArray(r.ings)) S.cache[r.name]=r.ings;});
+  store.listen("cache",rows=>{for(const r of rows) if(r.name&&Array.isArray(r.ings)){S.cache[r.name]=r.ings;if(r.aisles&&typeof r.aisles==="object")for(const [k,v] of Object.entries(r.aisles))S.aisleMap[norm(k)]=v;}});
+  store.listen("settings",rows=>{const a=rows.find(r=>r.id==="aisles");S.aisles=a&&Array.isArray(a.list)&&a.list.length?a.list:AISLES_DEFAULT.slice();render();});
   store.listen("week",rows=>{const w=rows.find(r=>r.id==="current");S.week=w||null;render();});
 }
 function startApp(){
