@@ -179,6 +179,29 @@ details.fold summary{cursor:pointer;color:var(--muted);font-weight:700;padding:8
 .hcard.editing{border:2px solid var(--terra)}
 .echip{display:inline-flex;align-items:center;gap:2px;padding-right:2px}
 .echip button{border:none;background:none;color:var(--sage);font-weight:700;padding:0 6px;min-height:26px;font-size:.85rem}
+.addwrap{margin:14px 0}
+.addwrap .addform{margin:0}
+.tgts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.tgts span{font-size:.75rem;color:var(--muted);font-weight:700;margin-right:2px}
+.tgt{border:1.5px solid var(--line);background:var(--sheet);border-radius:999px;padding:5px 12px;font-size:.82rem;min-height:36px}
+.tgt.on{border-color:var(--terra);background:var(--terra-soft);color:var(--terra);font-weight:700}
+.day{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;position:relative;transition:transform .15s ease}
+.day.lifted{z-index:5;transition:none;border-color:var(--terra);box-shadow:0 10px 24px rgba(80,40,20,.22)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper span{width:4em}
+.stepper .btn{min-height:42px;width:46px;padding:0;font-size:1.2rem}
+.stepper b{min-width:3em;text-align:center;font-variant-numeric:tabular-nums}
+.back{align-self:flex-start}
+.rcard{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.rcard b{font-family:var(--f-display)}
+.ring{list-style:none;margin:6px 0 0;padding:0}
+.ring li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.ring li:last-child{border-bottom:none}
+.ring li span:last-child{color:var(--muted);white-space:nowrap}
+.rsteps{margin:6px 0 0;padding-left:1.4em}
+.rsteps li{padding:5px 0 5px 4px;line-height:1.7}
+.rcard.tips p{margin:4px 0 0;font-size:.92rem}
+.rnote{font-size:.75rem;color:var(--muted);margin:4px 2px 0}
 /* swipe to delete */
 .swipe{position:relative;overflow:hidden;border-radius:var(--r)}
 .swipe-del{position:absolute;top:0;bottom:0;right:0;width:84px;border:none;background:#c84b3a;color:#fff;border-radius:var(--r);font-weight:700;font-size:.82rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
@@ -320,7 +343,7 @@ const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/
 
 // ================= state =================
 const AISLES_DEFAULT=["野菜・果物","肉","魚","豆腐・納豆・練り物","卵・乳製品","パン・麺・米","調味料","乾物・缶詰","冷凍食品","お菓子・飲み物","日用品"];
-const S = {menus:[],shop:[],history:[],plan:[],cart:[],trash:[],cache:{},week:null,aisles:AISLES_DEFAULT.slice(),aisleMap:{}};
+const S = {household:{adults:2,kids:0},menus:[],shop:[],history:[],plan:[],cart:[],trash:[],cache:{},week:null,aisles:AISLES_DEFAULT.slice(),aisleMap:{}};
 let screen="loading", tab=ls.get("kondate.tab","chat");
 let myName=ls.get("kondate.name","");
 let mode=ls.get("kondate.mode",null);       // "firebase" | "local" | null
@@ -401,13 +424,17 @@ const promptDecompose=name=>"以下の料理を作るために必要な一般的
 const promptClassify=names=>"次の食材を、スーパーの売り場ごとに分類してください。"+aisleRule()+"出力はJSON配列のみで、形式は [{\"name\":\"牛乳\",\"aisle\":\"卵・乳製品\"}] です。食材名は入力のまま変えないでください。余計な解説は不要です。食材: "+names.join("、");
 let geminiKey=ls.get("kondate.geminiKey",""), modelName=ls.get("kondate.model",MODEL_DEFAULT), aiFails=0;
 const aiReady=()=>!!geminiKey;
-async function geminiOnce(model,prompt,key){
-  const ctrl=new AbortController(); const timer=setTimeout(()=>ctrl.abort(),20000);
+// Thinking off: 2.5 models take thinkingBudget:0; newer ones take a thinking level. If a model rejects it (400), we retry without.
+const thinkCfg=model=>/2\.5/.test(model)?{thinkingBudget:0}:{thinkingLevel:"low"};
+let noThink=ls.get("kondate.nothink",{});
+async function geminiOnce(model,prompt,key,think,ms){
+  const ctrl=new AbortController(); const timer=setTimeout(()=>ctrl.abort(),ms||20000);
+  const gc={responseMimeType:"application/json"}; if(think) gc.thinkingConfig=think;
   try{
     const res=await fetch(GEMINI_BASE+model+":generateContent",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-goog-api-key":key},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json"}}),
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:gc}),
       signal:ctrl.signal
     });
     if(!res.ok){const err=new Error("HTTP "+res.status);err.status=res.status;throw err;}
@@ -416,12 +443,19 @@ async function geminiOnce(model,prompt,key){
     return parts.map(p=>p.text||"").join("");
   } finally { clearTimeout(timer); }
 }
-async function callGemini(prompt,key){
+async function callGemini(prompt,key,ms){
   const order=[modelName,...[MODEL_DEFAULT,...MODEL_FALLBACKS].filter(m=>m!==modelName)];
   let lastErr;
   for(const m of order){
     try{
-      const txt=await geminiOnce(m,prompt,key||geminiKey);
+      const k=key||geminiKey, cfg=noThink[m]?null:thinkCfg(m);
+      let txt;
+      try{ txt=await geminiOnce(m,prompt,k,cfg,ms); }
+      catch(e){
+        if(!(cfg&&e&&e.status===400)) throw e;
+        txt=await geminiOnce(m,prompt,k,null,ms);   // still 400 → bad key, thrown below as usual
+        noThink[m]=true; ls.set("kondate.nothink",noThink);
+      }
       if(m!==modelName){modelName=m;ls.set("kondate.model",m);}
       return txt;
     }catch(e){lastErr=e; if(e&&e.status===404) continue; throw e;}
@@ -531,10 +565,12 @@ async function decompose(name){
   if(d) return {ings:d,src:"dict"};
   return {ings:GENERIC,src:"generic"};
 }
+const uniq=a=>[...new Set(a.filter(Boolean))];
 async function addDishesToShop(dishes){
-  const merged={}; const generic=[];
+  const merged={}; const generic=[]; const resolved={};
   for(const d of dishes){
     const r=d.ings&&d.ings.length?{ings:d.ings,src:"given"}:await decompose(d.name);
+    resolved[d.name]=r.ings;
     if(r.src==="generic") generic.push(d.name);
     for(const ing of r.ings){
       const id=hid(ing);
@@ -545,14 +581,15 @@ async function addDishesToShop(dishes){
   }
   for(const [id,v] of Object.entries(merged)){ await store.set("shop",id,v).catch(()=>{}); if(S.trash.some(t=>t.id===id)) store.del("trash",id).catch(()=>{}); }
   const now=Date.now();
-  await Promise.all(dishes.map((d,i)=>{const c=S.cart.find(x=>norm(x.name)===norm(d.name));return store.set("cart",hid(d.name),{name:d.name,at:c?c.at:now+i}).catch(()=>{});}));
+  await Promise.all(dishes.map((d,i)=>{const c=S.cart.find(x=>norm(x.name)===norm(d.name));
+    return store.set("cart",hid(d.name),{name:d.name,at:c?c.at:now+i,ings:uniq([...((c&&c.ings)||[]),...(d.ings||resolved[d.name]||[])]),added:(c&&c.added)||[]}).catch(()=>{});}));
   classifyMissing();
   return generic;
 }
 
 // ================= UI shell =================
 const whoName=id=>!id?"":(id===myName?"わたし":id);
-function setTab(t){tab=t;ls.set("kondate.tab",t);confirmDone=false;confirmClear=false;openSwipe=null;editHist=null;render();$("#main").scrollTop=0;if(t==="chat")scrollChatEnd();}
+function setTab(t){tab=t;ls.set("kondate.tab",t);confirmDone=false;confirmClear=false;openSwipe=null;editHist=null;recipeView=null;recipeState=null;render();$("#main").scrollTop=0;if(t==="chat")scrollChatEnd();}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 const selected=new Set();
 let busy=false,confirmDone=false,confirmClear=false,showHistForm=false,boughtOpen=false,trashOpen=false;
@@ -813,7 +850,13 @@ function shopView(){
     :'<button class="btn sage block" id="doneBtn" type="button">買い物を完了する</button>')+'</div>';
   return h;
 }
-function addForm(){return '<form class="addform" id="addForm"><input type="text" id="addIn" placeholder="＋ 食材を手で追加（例：牛乳 卵）" autocomplete="off"><button class="btn ghost" type="submit">追加</button></form>';}
+let addTarget="";
+function addForm(){
+  const ds=tripDishes(); if(addTarget&&!ds.includes(addTarget)) addTarget="";
+  const chip=(v,label)=>'<button class="tgt'+(addTarget===v?' on':'')+'" data-target="'+esc(v)+'" type="button" aria-pressed="'+(addTarget===v)+'">'+esc(label)+'</button>';
+  return '<div class="addwrap"><form class="addform" id="addForm"><input type="text" id="addIn" placeholder="＋ 食材を手で追加（例：牛乳 卵）" autocomplete="off"><button class="btn ghost" type="submit">追加</button></form>'+
+    (ds.length?'<div class="tgts"><span>追加先</span>'+chip("","献立外（日用品など）")+ds.map(d=>chip(d,d)).join("")+'</div>':'')+'</div>';
+}
 async function trashItem(x){
   S.shop=S.shop.filter(i=>i.id!==x.id); S.trash=[...S.trash.filter(t=>t.id!==x.id),{id:x.id,...shopDoc(x),at:Date.now()}]; render();
   toast("「"+x.name+"」を消しました",()=>restoreItem(x.id));
@@ -834,11 +877,21 @@ function bindShop(){
   document.querySelectorAll("[data-restore]").forEach(b=>b.addEventListener("click",()=>{const t=S.trash.find(i=>i.id===b.dataset.restore);restoreItem(b.dataset.restore);if(t)toast("「"+t.name+"」をリストに戻しました");}));
   const ba=$("#boughtArea"); if(ba) ba.addEventListener("toggle",()=>{boughtOpen=ba.open;});
   const ta=$("#trashArea"); if(ta) ta.addEventListener("toggle",()=>{trashOpen=ta.open;});
+  document.querySelectorAll("[data-target]").forEach(b=>b.addEventListener("click",()=>{addTarget=b.dataset.target;render();}));
   $("#addForm").addEventListener("submit",async e=>{
     e.preventDefault();const names=splitNames($("#addIn").value);if(!names.length)return;$("#addIn").value="";
+    const dish=addTarget, tag=dish||"手で追加";
     await Promise.all(names.map(v=>{const id=hid(v);const cur=S.shop.find(i=>i.id===id);
       if(S.trash.some(t=>t.id===id)) store.del("trash",id).catch(()=>{});
-      return store.set("shop",id,{name:cur?cur.name:v,tags:cur?(cur.tags||[]):["手で追加"],checked:false,aisle:(cur&&cur.aisle)||S.aisleMap[norm(v)]||""}).catch(()=>{});}));
+      const tags=uniq([...((cur&&cur.tags)||[]).filter(t=>!(dish&&t==="手で追加")),tag]);
+      return store.set("shop",id,{name:cur?cur.name:v,tags,checked:false,aisle:(cur&&cur.aisle)||S.aisleMap[norm(v)]||""}).catch(()=>{});}));
+    if(dish){
+      // Also make it part of that dish, so it reaches 履歴 when the dish is made.
+      const c=S.cart.find(x=>norm(x.name)===norm(dish));
+      const base=(c&&c.ings&&c.ings.length)?c.ings:((histFor(dish)||{}).ings||S.shop.filter(x=>(x.tags||[]).includes(dish)).map(x=>x.name));
+      await store.set("cart",hid(dish),{name:dish,at:c?c.at:Date.now(),ings:uniq([...base,...names]),added:uniq([...((c&&c.added)||[]),...names])}).catch(()=>{});
+      toast("「"+names.join("・")+"」を"+dish+"の食材として追加しました");
+    }
     classifyMissing();
   });
   const d=$("#doneBtn"); if(d) d.addEventListener("click",()=>{confirmDone=true;render();});
@@ -853,9 +906,10 @@ async function completeShopping(){
   const now=Date.now(); let i=0;
   for(const [name,got] of Object.entries(dishes)){
     const h=histFor(name), c=S.cart.find(x=>norm(x.name)===norm(name));
-    const ings=(h&&h.ings)||(c&&c.ings&&c.ings.length?c.ings:got);
+    // The dish's own list (saved when it was added) wins: ✓ and × only mean "buy this time or not".
+    const ings=(c&&c.ings&&c.ings.length)?c.ings:(h&&h.ings)||got;
     const m=[...S.menus].filter(x=>x.type==="dish"&&norm(x.name)===norm(name)).sort((a,b)=>b.at-a.at)[0];
-    await store.set("plan",hid(name),{name,ings,by:m?m.by:myName,at:now+(i++)}).catch(()=>{});
+    await store.set("plan",hid(name),{name,ings,added:(c&&c.added)||[],by:m?m.by:myName,at:now+(i++)}).catch(()=>{});
     for(const mm of S.menus.filter(x=>x.type==="dish"&&!x.done&&norm(x.name)===norm(name))){
       await store.set("menus",mm.id,{type:"dish",name:mm.name,by:mm.by||"",at:mm.at,done:true}).catch(()=>{});
     }
@@ -866,24 +920,102 @@ async function completeShopping(){
 
 // ================= plan (今週の予定) & history =================
 const histSame=name=>S.history.filter(h=>norm(h.name)===norm(name));
-// The ingredient list to reuse for a dish: the most recently edited/made history entry with that name.
+// The ingredient list to reuse for a dish: a hand-edited list wins (newest edit first); otherwise the newest entry.
 function histFor(name){
-  return histSame(name).filter(h=>Array.isArray(h.ings)&&h.ings.length).sort((a,b)=>(b.editedAt||b.at||0)-(a.editedAt||a.at||0))[0]||null;
+  return histSame(name).filter(h=>Array.isArray(h.ings)&&h.ings.length).sort((a,b)=>(b.editedAt?1:0)-(a.editedAt?1:0)||(b.editedAt||b.at||0)-(a.editedAt||a.at||0))[0]||null;
 }
 const strip=r=>{const {id,...d}=r;return d;};
 async function madeIt(p){
   const now=Date.now(); const prev=histFor(p.name)||histSame(p.name)[0]; let newId=null;
-  if(prev){ const d=strip(prev); delete d.sample; await store.set("history",prev.id,{...d,at:now,by:p.by||d.by||myName,ings:(prev.ings&&prev.ings.length)?prev.ings:p.ings}).catch(()=>{}); }
+  if(prev){
+    const d=strip(prev); delete d.sample;
+    const base=(prev.ings&&prev.ings.length)?prev.ings:(p.ings||[]);
+    const ings=uniq([...base,...(p.added||[])]);
+    if(ings.length>base.length) d.editedAt=now;   // ingredients added for this dish on the shopping page become part of it
+    await store.set("history",prev.id,{...d,at:now,by:p.by||d.by||myName,ings}).catch(()=>{});
+  }
   else { newId=uid(); await store.set("history",newId,{name:p.name,by:p.by||myName,at:now,ings:p.ings||[]}).catch(()=>{}); }
   await store.del("plan",p.id).catch(()=>{});
   return ()=>{store.set("plan",p.id,strip(p)).catch(()=>{}); if(prev) store.set("history",prev.id,strip(prev)).catch(()=>{}); else store.del("history",newId).catch(()=>{});};
 }
+function dupGroups(){const g={};S.history.forEach(x=>{(g[norm(x.name)]=g[norm(x.name)]||[]).push(x);});return Object.values(g).filter(a=>a.length>1);}
+// Keep the newest row of each same-named dish, with the most recently edited ingredient list; delete the rest.
+async function mergeDups(){
+  const groups=dupGroups(); if(!groups.length) return;
+  const orig=groups.flat().map(r=>({...r})); let removed=0;
+  const plan=groups.map(g=>{
+    const sorted=[...g].sort((a,b)=>b.at-a.at), keep=sorted[0], src=histFor(keep.name)||keep;
+    const doc=strip(keep); doc.ings=src.ings||keep.ings||[]; if(g.some(x=>!x.sample)) delete doc.sample;
+    return {keep,doc,drop:sorted.slice(1)};
+  });
+  const gone=new Set(plan.flatMap(x=>x.drop.map(d=>d.id)));
+  S.history=S.history.filter(h=>!gone.has(h.id)).map(h=>{const x=plan.find(q=>q.keep.id===h.id);return x?{id:h.id,...x.doc}:h;});
+  removed=gone.size; render();
+  toast("重なっていた"+removed+"件をまとめました",()=>orig.forEach(r=>store.set("history",r.id,strip(r)).catch(()=>{})));
+  for(const x of plan){
+    await store.set("history",x.keep.id,x.doc).catch(()=>{});
+    for(const d of x.drop) await store.del("history",d.id).catch(()=>{});
+  }
+}
 let editHist=null, editDraft=[];
+// ---- recipe (AI), cached per dish + ingredient list + household size so both phones see the same one
+const HOUSE_DEFAULT={adults:2,kids:0};
+const servText=()=>{const h=S.household||HOUSE_DEFAULT;return "大人"+h.adults+"人"+(h.kids?"・子ども"+h.kids+"人":"")+"分";};
+let recipeView=null, recipeState=null;
+const recipeKey=r=>"r"+hid(norm(r.name)+"|"+(r.ings||[]).join(",")+"|"+servText());
+const promptRecipe=r=>{const h=S.household||HOUSE_DEFAULT;
+  return "次の料理の、家庭で作りやすいレシピを作ってください。料理名: "+r.name+"。人数: "+servText()+(h.kids?"（子どもは大人の半量くらいで計算）":"")+"。"+
+  ((r.ings||[]).length?"材料はなるべく次の食材を使い、足りない調味料などは足してください: "+r.ings.join("、")+"。":"")+
+  "分量はグラム・個・大さじなど具体的に書いてください。出力はJSONオブジェクトのみで、形式は {\"time\":\"約30分\",\"ingredients\":[{\"name\":\"豚肉\",\"amount\":\"200g\"}],\"steps\":[\"手順1\",\"手順2\"],\"tips\":\"コツをひとこと\"} です。余計な解説は不要です。";};
+function parseRecipe(txt){
+  const m=String(txt||"").replace(/```(?:json)?/g,"").match(/\{[\s\S]*\}/); if(!m) return null;
+  let o; try{o=JSON.parse(m[0]);}catch(e){return null;}
+  if(!o||!Array.isArray(o.ingredients)||!Array.isArray(o.steps)||!o.steps.length) return null;
+  return {time:String(o.time||""),tips:String(o.tips||""),
+    ingredients:o.ingredients.map(x=>typeof x==="string"?{name:x,amount:""}:{name:String(x&&x.name||""),amount:String(x&&x.amount||"")}).filter(x=>x.name),
+    steps:o.steps.map(x=>String(x)).filter(Boolean)};
+}
+async function openRecipe(r,force){
+  recipeView={name:r.name,ings:r.ings||[]}; const key=recipeKey(recipeView);
+  recipeState={status:"loading",key}; render(); $("#main").scrollTop=0;
+  try{
+    if(!force){ const got=await store.get("recipes",key); if(recipeState.key!==key) return;
+      if(got&&got.recipe){recipeState={status:"ok",key,data:got.recipe};render();return;} }
+    if(!aiReady()){recipeState={status:"nokey",key};render();return;}
+    const data=parseRecipe(await callGemini(promptRecipe(recipeView),null,45000));
+    if(recipeState.key!==key) return;
+    if(!data){recipeState={status:"err",key,msg:"レシピの形がうまく読み取れませんでした。"};render();return;}
+    recipeState={status:"ok",key,data}; render();
+    store.set("recipes",key,{name:recipeView.name,serv:servText(),ings:recipeView.ings,recipe:data,at:Date.now()}).catch(()=>{});
+  }catch(e){ if(recipeState&&recipeState.key===key){recipeState={status:"err",key,msg:aiErrText(e)};render();} }
+}
+function recipePage(){
+  const r=recipeView, st=recipeState||{};
+  let h='<button class="linkbtn back" id="rBack" type="button">← 今週の予定に戻る</button><h2 style="margin-top:12px">'+esc(r.name)+'</h2>';
+  if(st.status==="loading") return h+'<div class="empty"><span class="spin dark" style="display:inline-block;margin-bottom:8px"></span><br>レシピを用意しています…<br><small>初めての献立は10秒ほどかかります</small></div>';
+  if(st.status==="nokey") return h+'<div class="empty">レシピの表示には、Gemini APIキーが必要です。<br>右上の歯車（設定）から入れてください。<br><br><button class="btn" id="rKey" type="button">設定を開く</button></div>';
+  if(st.status==="err") return h+'<div class="empty">'+esc(st.msg||"うまくいきませんでした。")+'<br><br><button class="btn" id="rRetry" type="button">もう一度</button></div>';
+  const d=st.data;
+  h+='<p class="lead">'+esc(servText())+(d.time?' ・ '+esc(d.time):'')+'</p>';
+  h+='<div class="rcard"><b>材料</b><ul class="ring">'+d.ingredients.map(x=>'<li><span>'+esc(x.name)+'</span><span>'+esc(x.amount)+'</span></li>').join("")+'</ul></div>';
+  h+='<div class="rcard"><b>作り方</b><ol class="rsteps">'+d.steps.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ol></div>';
+  if(d.tips) h+='<div class="rcard tips"><b>コツ</b><p>'+esc(d.tips)+'</p></div>';
+  h+='<p class="rnote">AIが作った目安のレシピです。分量や加熱時間は様子を見て調整し、肉や魚は中までしっかり火を通してください。人数は設定で変えられます。</p>';
+  h+='<div class="actions"><button class="btn ghost block" id="rRedo" type="button">別のレシピに作り直す</button><button class="btn block" id="rBack2" type="button">今週の予定に戻る</button></div>';
+  return h;
+}
+function bindRecipe(){
+  const back=()=>{recipeView=null;recipeState=null;render();$("#main").scrollTop=0;};
+  ["#rBack","#rBack2"].forEach(s=>{const b=$(s);if(b)b.addEventListener("click",back);});
+  const k=$("#rKey"); if(k) k.addEventListener("click",openSettings);
+  const rt=$("#rRetry"); if(rt) rt.addEventListener("click",()=>openRecipe(recipeView));
+  const rd=$("#rRedo"); if(rd) rd.addEventListener("click",()=>openRecipe(recipeView,true));
+}
 function planSection(){
   const ps=[...S.plan].sort((a,b)=>a.at-b.at);
   if(!ps.length) return '';
   return '<section class="plan"><h2>今週の予定献立</h2><p class="lead">買い物が済んだ献立です。作ったら「作った」を押すと、下の履歴に入ります。</p><div class="stack" style="gap:8px">'+
-    ps.map(p=>swipeWrap("plan:"+p.id,'<div class="pcard"><div class="pw"><span class="dish">'+esc(p.name)+'</span><span class="pi">'+esc((p.ings||[]).join("・"))+'</span></div><button class="btn sage pmade" data-made="'+esc(p.id)+'" type="button">'+CHECK+'作った</button></div>')).join("")+
+    ps.map(p=>swipeWrap("plan:"+p.id,'<div class="pcard"><div class="pw"><span class="dish">'+esc(p.name)+'</span><span class="pi">'+esc((p.ings||[]).join("・"))+'</span><button class="editbtn" data-recipe="'+esc(p.id)+'" type="button">📖 レシピを見る</button></div><button class="btn sage pmade" data-made="'+esc(p.id)+'" type="button">'+CHECK+'作った</button></div>')).join("")+
     '</div>'+(ps.length>1?'<button class="btn ghost block" id="allMade" type="button" style="margin-top:10px">全部作った</button>':'')+'</section>';
 }
 function histCard(x){
@@ -897,9 +1029,12 @@ function histCard(x){
   return swipeWrap("history:"+x.id,'<div class="hcard"><div class="top"><span class="dish">'+esc(x.name)+(x.sample?' <span class="chip">例</span>':'')+'</span><span class="meta">'+fmtDate(x.at)+(x.by?' ・ '+esc(whoName(x.by)):'')+'</span></div><div class="tags">'+(x.ings||[]).map(i=>'<span class="chip">'+esc(i)+'</span>').join("")+'<button class="editbtn" data-edit="'+esc(x.id)+'" type="button">✎ 食材を編集</button></div><div class="row"><button class="hbtn" data-again="'+esc(x.id)+'" type="button">＋ 買い物リストに追加</button><button class="hbtn" data-post="'+esc(x.id)+'" type="button" style="color:var(--sage)">チャットに出す</button></div></div>');
 }
 function histView(){
+  if(recipeView) return recipePage();
   const hs=[...S.history].sort((a,b)=>b.at-a.at);
   let h=planSection();
   h+='<h2>献立履歴</h2><p class="lead">作った献立がたまっていきます。「7日おまかせ」はここから選びます。<br>← 左にスライドすると消せます。</p>';
+  const dg=dupGroups();
+  if(dg.length){const extra=dg.reduce((n,g)=>n+g.length-1,0);h+='<div class="confirm" style="margin-bottom:12px"><b>同じ名前の献立が重なっています</b><span style="font-size:.88rem">'+esc(dg.map(g=>g[0].name).join("・"))+'（あと'+extra+'件ぶん）。いちばん新しい1枚にまとめます。食材は、最後に直した内容を残します。</span><button class="btn" id="mergeDup" type="button">重なりをまとめる</button></div>';}
   h+= showHistForm
     ? '<form class="hcard" id="histForm" style="margin-bottom:12px"><b>履歴に手で登録</b><input type="text" id="hName" placeholder="献立名（例：筑前煮）" autocomplete="off"><input type="text" id="hIngs" placeholder="食材を「、」で区切る（空なら自動）" autocomplete="off"><div class="row"><button type="button" class="btn ghost" id="hCancel" style="flex:1">やめる</button><button class="btn" type="submit" style="flex:1">登録</button></div></form>'
     : '<button class="btn ghost block" id="hOpen" type="button" style="margin-bottom:12px">＋ 履歴に手で献立を登録</button>';
@@ -908,9 +1043,14 @@ function histView(){
   return h;
 }
 function bindHist(){
+  if(recipeView){bindRecipe();return;}
+  document.querySelectorAll("[data-recipe]").forEach(b=>b.addEventListener("click",()=>{const p=S.plan.find(x=>x.id===b.dataset.recipe);if(p)openRecipe(p);}));
   const o=$("#hOpen"); if(o) o.addEventListener("click",()=>{showHistForm=true;render();const i=$("#hName");if(i)i.focus();});
+  const md=$("#mergeDup"); if(md) md.addEventListener("click",mergeDups);
   const c=$("#hCancel"); if(c) c.addEventListener("click",()=>{showHistForm=false;render();});
-  const f=$("#histForm"); if(f) f.addEventListener("submit",async e=>{e.preventDefault();const name=$("#hName").value.trim();if(!name)return;let ings=splitNames($("#hIngs").value);if(!ings.length)ings=(await decompose(name)).ings;await store.set("history",uid(),{name,by:myName,at:Date.now(),editedAt:Date.now(),ings}).catch(()=>{});showHistForm=false;render();toast("「"+name+"」を履歴に登録しました");});
+  const f=$("#histForm"); if(f) f.addEventListener("submit",async e=>{e.preventDefault();const name=$("#hName").value.trim();if(!name)return;let ings=splitNames($("#hIngs").value);const ex=[...histSame(name)].sort((a,b)=>b.at-a.at)[0];
+    if(ex){const d=strip(ex);delete d.sample;const typed=ings.length>0;await store.set("history",ex.id,{...d,at:Date.now(),ings:typed?ings:(histFor(name)||ex).ings||[],...(typed?{editedAt:Date.now()}:{})}).catch(()=>{});showHistForm=false;render();toast("「"+name+"」はすでにあるので、日付を新しくしました");return;}
+    if(!ings.length)ings=(await decompose(name)).ings;await store.set("history",uid(),{name,by:myName,at:Date.now(),editedAt:Date.now(),ings}).catch(()=>{});showHistForm=false;render();toast("「"+name+"」を履歴に登録しました");});
   document.querySelectorAll("[data-again]").forEach(b=>b.addEventListener("click",async()=>{const x=S.history.find(h=>h.id===b.dataset.again);if(!x)return;const src=histFor(x.name)||x;await addDishesToShop([{name:x.name,ings:src.ings}]);toast("「"+x.name+"」の食材をリストに入れました");render();}));
   document.querySelectorAll("[data-post]").forEach(b=>b.addEventListener("click",async()=>{const x=S.history.find(h=>h.id===b.dataset.post);if(!x)return;await postDish(x.name);toast("チャットに出しました");}));
   // plan
@@ -954,14 +1094,14 @@ function shuffleAll(){
 }
 function weekView(){
   const days=weekDays(); const n=new Set(S.history.map(h=>h.name)).size;
-  let h='<h2>7日おまかせ献立</h2><p class="lead">履歴から1週間分をくじ引きします。気に入った日は鍵でとめておけます。</p>';
+  let h='<h2>7日おまかせ献立</h2><p class="lead">履歴から1週間分をくじ引きします。気に入った日は鍵でとめておけます。<br>献立を長押しすると、上下に動かして曜日を入れ替えられます。</p>';
   h+='<div class="weekbar"><button class="toggle" id="fillT" type="button" aria-pressed="'+fillDict+'"><span class="sw"></span>足りない分はおすすめ料理で補う</button></div>';
   if(n<7&&!fillDict) h+='<p class="lead" style="color:var(--terra)">履歴が'+n+'件なので、空く日が出ます。</p>';
   if(!days) return h+'<div class="empty">まだ今週の献立がありません<br><br><button class="btn" id="firstShuffle" type="button">7日分をつくる</button></div>';
   const fromHist=new Set(S.history.map(x=>x.name));
   h+='<div class="stack" style="gap:8px">'+days.map((d,i)=>{
     const on=d.on!==false;
-    return '<div class="day '+(on?"on":"off")+' '+(animDays.has(i)?"shake":"")+'"><button class="ck" data-on="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を買い物に'+(on?"含めない":"含める")+'"><span class="box">'+CHECK+'</span></button><span class="dw '+(i===5?"sat":i===6?"sun":"")+'">'+DOW[i]+'</span><span class="name">'+(d.name?esc(d.name):'<span style="color:var(--muted)">（空き）</span>')+(d.name&&!fromHist.has(d.name)?'<small>おすすめ料理から</small>':'')+'</span><button class="mini '+(d.locked?"locked":"")+'" data-lock="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を'+(d.locked?"固定解除":"固定")+'" aria-pressed="'+!!d.locked+'"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="'+(d.locked?"M7 11V7a5 5 0 0 1 10 0v4":"M7 11V7a5 5 0 0 1 9.9-1")+'"/></svg></button><button class="mini" data-re="'+i+'" type="button" aria-label="'+DOW[i]+'曜日だけ引き直す" '+(d.locked?"disabled":"")+'><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"/></svg></button></div>';
+    return '<div class="day '+(on?"on":"off")+' '+(animDays.has(i)?"shake":"")+'" data-i="'+i+'"><button class="ck" data-on="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を買い物に'+(on?"含めない":"含める")+'"><span class="box">'+CHECK+'</span></button><span class="dw '+(i===5?"sat":i===6?"sun":"")+'">'+DOW[i]+'</span><span class="name">'+(d.name?esc(d.name):'<span style="color:var(--muted)">（空き）</span>')+(d.name&&!fromHist.has(d.name)?'<small>おすすめ料理から</small>':'')+'</span><button class="mini '+(d.locked?"locked":"")+'" data-lock="'+i+'" type="button" aria-label="'+DOW[i]+'曜日を'+(d.locked?"固定解除":"固定")+'" aria-pressed="'+!!d.locked+'"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="'+(d.locked?"M7 11V7a5 5 0 0 1 10 0v4":"M7 11V7a5 5 0 0 1 9.9-1")+'"/></svg></button><button class="mini" data-re="'+i+'" type="button" aria-label="'+DOW[i]+'曜日だけ引き直す" '+(d.locked?"disabled":"")+'><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"/></svg></button></div>';
   }).join("")+'</div>';
   const cnt=days.filter(d=>d.on!==false&&d.name).length;
   h+='<div class="actions"><button class="btn ghost block" id="shuf" type="button"><svg class="i" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>全体をシャッフル</button>'+
@@ -990,6 +1130,66 @@ function bindWeek(){
   });
 }
 
+// Long-press a day, then slide up/down: the dish (name + lock) moves, weekdays and the ✓ stay put.
+let wDrag=null, wJustDropped=false;
+(function bindWeekDrag(){
+  const main=$("#main");
+  const start=(e,x,y)=>{
+    if(tab!=="week"||screen!=="app") return;
+    const row=e.target.closest(".day[data-i]"); if(!row||e.target.closest("button")) return;
+    if(wDrag) clearTimeout(wDrag.timer);
+    wDrag={row,from:+row.dataset.i,x,y,active:false,timer:setTimeout(lift,380)};
+  };
+  function lift(){
+    const d=wDrag; if(!d||!d.row.isConnected){wDrag=null;return;}
+    const days=weekDays(); if(!days||!days[d.from].name){wDrag=null;return;}
+    d.active=true; d.rows=[...document.querySelectorAll(".day[data-i]")];
+    const rc=d.rows.map(r=>r.getBoundingClientRect()); d.step=rc.length>1?rc[1].top-rc[0].top:rc[0].height+8; d.to=d.from;
+    d.row.classList.add("lifted"); try{navigator.vibrate&&navigator.vibrate(12);}catch(err){}
+    d.s0=main.scrollTop; d.ly=d.y; autoScroll();
+  }
+  // While a tile is held near the top/bottom edge of the list, keep scrolling so far-away days can be reached.
+  function autoScroll(){
+    const d=wDrag; if(!d||!d.active) return;
+    const r=main.getBoundingClientRect(), edge=70; let v=0;
+    // Only scroll toward the edge the finger has moved to (a tile picked up near the bottom shouldn't start the list moving).
+    if(d.ly<r.top+edge&&d.ly<d.y-20) v=-Math.ceil((r.top+edge-d.ly)/8); else if(d.ly>r.bottom-edge&&d.ly>d.y+20) v=Math.ceil((d.ly-(r.bottom-edge))/8);
+    if(v){const before=main.scrollTop;main.scrollTop+=v;if(main.scrollTop!==before)place();}
+    requestAnimationFrame(autoScroll);
+  }
+  function place(){
+    const d=wDrag; if(!d||!d.active) return;
+    const dy=(d.ly-d.y)+(main.scrollTop-d.s0); d.row.style.transform="translateY("+dy+"px) scale(1.02)";
+    d.to=Math.max(0,Math.min(d.rows.length-1,d.from+Math.round(dy/d.step)));
+    d.rows.forEach((r,i)=>{ if(i===d.from) return; let s=0;
+      if(d.from<d.to&&i>d.from&&i<=d.to) s=-d.step; else if(d.from>d.to&&i<d.from&&i>=d.to) s=d.step;
+      r.style.transform=s?"translateY("+s+"px)":""; });
+  }
+  const move=(e,x,y)=>{
+    const d=wDrag; if(!d) return;
+    if(!d.active){ if(Math.abs(x-d.x)>8||Math.abs(y-d.y)>8){clearTimeout(d.timer);wDrag=null;} return; }
+    if(e.cancelable) e.preventDefault();
+    d.ly=y; place();
+  };
+  const end=()=>{
+    const d=wDrag; if(!d) return; clearTimeout(d.timer); wDrag=null; if(!d.active) return;
+    d.rows.forEach(r=>{r.style.transform="";}); d.row.classList.remove("lifted");
+    wJustDropped=true; setTimeout(()=>{wJustDropped=false;},120);
+    if(d.to===d.from) return;
+    const days=weekDays(); const pay=days.map(x=>({name:x.name,locked:!!x.locked}));
+    const [m]=pay.splice(d.from,1); pay.splice(d.to,0,m);
+    animDays=new Set(); saveWeek(days.map((x,i)=>({...pay[i],on:x.on!==false})));
+  };
+  main.addEventListener("touchstart",e=>{const t=e.touches[0];if(e.touches.length===1)start(e,t.clientX,t.clientY);},{passive:true});
+  main.addEventListener("touchmove",e=>{const t=e.touches[0];move(e,t.clientX,t.clientY);},{passive:false});
+  main.addEventListener("touchend",end); main.addEventListener("touchcancel",end);
+  main.addEventListener("mousedown",e=>{if(e.button===0)start(e,e.clientX,e.clientY);});
+  window.addEventListener("mousemove",e=>move(e,e.clientX,e.clientY));
+  window.addEventListener("mouseup",end);
+  main.addEventListener("contextmenu",e=>{if(e.target.closest(".day[data-i]"))e.preventDefault();});
+  main.addEventListener("click",e=>{if(wJustDropped&&e.target.closest(".day[data-i]")){e.stopPropagation();e.preventDefault();}},true);
+})();
+
 // ================= settings modal =================
 function openSettings(){
   const ov=document.createElement("div");ov.className="modalwrap";
@@ -1007,6 +1207,9 @@ function openSettings(){
       '<div class="row"><button class="btn" id="keySave" type="button" style="flex:1">保存</button><button class="btn ghost" id="keyTest" type="button" style="flex:1">接続テスト</button></div>'+
       (geminiKey?'<button class="btn ghost block" id="keyDel" type="button">キーを消して辞書モードに戻す</button>':'')+
       '<div id="keyMsg" class="msgline" role="status"></div><span class="muted" style="font-size:.78rem">使用モデル：'+esc(modelName)+'</span></div>'+
+    '<div class="set"><b>レシピの人数</b><span class="muted">「今週の予定」のレシピを、この人数で作ります。この家庭（招待リンクでつながった人）で共通の設定です。</span>'+
+      ['adults','kids'].map(k=>'<div class="stepper"><span>'+(k==="adults"?"大人":"子ども")+'</span><button class="btn ghost" data-hh="'+k+':-1" type="button" aria-label="'+(k==="adults"?"大人":"子ども")+'を減らす">−</button><b id="hh_'+k+'">'+S.household[k]+'人</b><button class="btn ghost" data-hh="'+k+':1" type="button" aria-label="'+(k==="adults"?"大人":"子ども")+'を増やす">＋</button></div>').join("")+
+      '<span class="muted" style="font-size:.78rem">いまの設定：'+esc(servText())+'（子どもは大人の半量で計算します）</span></div>'+
     '<div class="set"><b>売り場の順番</b><span class="muted">よく行くスーパーを回る順に、売り場を1行にひとつずつ書いてください。買い物リストがこの順に並びます。ふたりで共通の設定です。</span>'+
       '<textarea id="aisleIn" class="plain" rows="8" spellcheck="false">'+esc(aisleDraft)+'</textarea>'+
       '<div class="row"><button class="btn" id="aisleSave" type="button" style="flex:1">順番を保存</button><button class="btn ghost" id="aisleReset" type="button" style="flex:1">はじめの順に戻す</button></div>'+
@@ -1030,6 +1233,10 @@ function openSettings(){
       catch(e){const m=q("#keyMsg");m.className="msgline err";m.textContent=aiErrText(e);}
     };
     q("#aisleIn").oninput=e=>{aisleDraft=e.target.value;};
+    ov.querySelectorAll("[data-hh]").forEach(b=>b.onclick=()=>{
+      const [k,dv]=b.dataset.hh.split(":"); const h={...S.household}; h[k]=Math.max(k==="adults"?1:0,Math.min(10,h[k]+(+dv)));
+      S.household=h; draw(); render(); store.set("settings","household",{...h,at:Date.now()}).catch(()=>{});
+    });
     const saveAisles=async list=>{
       list=[...new Set(list.map(x=>x.trim()).filter(Boolean))].slice(0,30);
       if(!list.length){toast("売り場を1つ以上書いてください");return;}
@@ -1050,7 +1257,7 @@ $("#gear").addEventListener("click",openSettings);
 $("#syncBadge").addEventListener("click",()=>{if(screen==="app")openSettings();});
 
 // ================= boot =================
-function resetData(){S.menus=[];S.shop=[];S.history=[];S.plan=[];S.cart=[];S.trash=[];S.cache={};S.week=null;S.aisles=AISLES_DEFAULT.slice();S.aisleMap={};seedTried=false;}
+function resetData(){S.household={adults:2,kids:0};S.menus=[];S.shop=[];S.history=[];S.plan=[];S.cart=[];S.trash=[];S.cache={};S.week=null;S.aisles=AISLES_DEFAULT.slice();S.aisleMap={};seedTried=false;}
 async function seedIfNeeded(){
   try{
     if(await store.get("meta","seeded")) return;
@@ -1070,7 +1277,7 @@ function subscribeAll(){
   store.listen("plan",rows=>{S.plan=rows;render();});
   store.listen("history",(rows,fromCache)=>{S.history=rows;render();if(!fromCache&&!seedTried){seedTried=true;seedIfNeeded();}});
   store.listen("cache",rows=>{for(const r of rows) if(r.name&&Array.isArray(r.ings)){S.cache[r.name]=r.ings;if(r.aisles&&typeof r.aisles==="object")for(const [k,v] of Object.entries(r.aisles))S.aisleMap[norm(k)]=v;}});
-  store.listen("settings",rows=>{const a=rows.find(r=>r.id==="aisles");S.aisles=a&&Array.isArray(a.list)&&a.list.length?a.list:AISLES_DEFAULT.slice();render();});
+  store.listen("settings",rows=>{const hh=rows.find(r=>r.id==="household");S.household=hh&&hh.adults>=1?{adults:+hh.adults,kids:+hh.kids||0}:{adults:2,kids:0};const a=rows.find(r=>r.id==="aisles");S.aisles=a&&Array.isArray(a.list)&&a.list.length?a.list:AISLES_DEFAULT.slice();render();});
   store.listen("week",rows=>{const w=rows.find(r=>r.id==="current");S.week=w||null;render();});
 }
 function startApp(){
